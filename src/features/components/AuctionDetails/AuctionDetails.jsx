@@ -193,7 +193,7 @@ const AuctionDetails = () => {
                 <div className="col-xl-6 col-lg-6 col-md-6 col-12">
                   <b className="d-block fw-medium">تقرير السيارة</b>
               <div className="d-flex align-items-center my-2">
-                <img className="object-fit-cover" src="/pdf.png" style={{ width: "30px", height: "30px" }} />
+                <img alt="image" className="object-fit-cover" src="/pdf.png" style={{ width: "30px", height: "30px" }} />
                 <span className="mx-2 text-sm">تقرير سيارة C180</span>
                 <small className="text-success">(2 ميجا بايت)</small>
               </div>
@@ -205,16 +205,19 @@ const AuctionDetails = () => {
                   <b className="d-block fw-medium">صور السيارة:</b>
                   <div className="d-flex">
                     <img
+                      alt="image"
                       src="/5.jpg"
                       className="img-thumbnail object-fit-cover mx-1 my-2"
                       style={{ width: "90px", height: "90px" }}
                     />
                     <img
+                      alt="image"
                       src="/6.jpg"
                       className="img-thumbnail object-fit-cover mx-1 my-2"
                       style={{ width: "90px", height: "90px" }}
                     />
                     <img
+                      alt="image"
                       src="/4.jpg"
                       className="img-thumbnail object-fit-cover mx-1 my-2"
                       style={{ width: "90px", height: "90px" }}
@@ -225,11 +228,13 @@ const AuctionDetails = () => {
                   <b className="d-block fw-medium">صور رخصة السيارة:</b>
                   <div className="d-flex">
                     <img
+                      alt="image"
                       src="/image.jpg"
                       className="img-thumbnail object-fit-cover mx-1 my-2"
                       style={{ width: "90px", height: "90px" }}
                     />
                     <img
+                      alt="image"
                       src="/image.jpg"
                       className="img-thumbnail object-fit-cover mx-1 my-2"
                       style={{ width: "90px", height: "90px" }}
