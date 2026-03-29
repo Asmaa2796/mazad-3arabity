@@ -1,0 +1,144 @@
+:root {
+  --main-color: #164282;
+  --sub-color: #386bf6;
+  --dark-color: #01033e;
+  --black-color: #040813;
+  --gray-color: #040813;
+  --basic-color: #fff;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('../src/Rubik-VariableFont_wght.ttf') format('truetype');
+  font-display: swap;
+}
+
+::selection {
+  background-color: var(--main-color);
+  color: var(--basic-color);
+}
+
+body::-webkit-scrollbar {
+  width: 10px;
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--basic-color);
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+}
+
+body {
+  margin: 0;
+  font-family: "Rubik", sans-serif !important;
+  position: relative;
+  direction: rtl;
+  text-align: right;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+button:focus,
+a:focus {
+  outline: none;
+}
+
+button:active,
+button:focus-visible,
+button:focus-within,
+button:focus,
+button:target {
+  border: none;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+.text-color {
+  color: var(--text-color) !important;
+}
+.main-color {
+  color: var(--main-color);
+}
+.main-bg {
+  background-color: var(--main-color);
+}
+.btn-main-color {background-color: var(--main-color);color: var(--basic-color);}
+.btn-main-color:hover {background-color: var(--sub-color);color: var(--basic-color);}
+.sub-bg {
+  background-color: var(--sub-color);
+}
+.border-main {
+  border-color: var(--main-color);
+}
+.sub-color {
+  color: var(--sub-color);
+}
+
+.sub-text {
+  color: var(--sub-color);
+}
+.dark-color {
+  color: var(--dark-color);
+}
+.black-color {
+  color: var(--black-color);
+}
+.gray-color {
+  color: var(--gray-color);
+}
+
+.text-lighter {
+  color: var(--text-lighter) !important;
+}
+
+.border-lighter {border: 1px solid #ffffff1f !important;}
+.text-lg {
+  font-size: large;
+}
+
+.text-md {
+  font-size: medium;
+}
+
+.text-sm {
+  font-size: small;
+}
+
+.text-xs {
+  font-size: x-small;
+}
+.text-custom {font-size: 12px;font-weight: bold;}
+.line-h {
+  line-height: 1.7em;
+}
+
+.b25 {
+  border-radius: 25px !important;
+}
+/* navbar */
+.navbar {padding: 0;background-color: var(--basic-color);}
+
+.navbar .nav-item {margin-inline: 0px 20px;}
+.navbar .nav-link {color: #333;}
+.navbar-brand img {width: auto;max-height: 75px;}
+
+/* swiper */
+.swiper-horizontal > .swiper-pagination-bullets, 
+.swiper-pagination-horizontal.swiper-pagination-bullets {
+     bottom: 7% !important;
+}
+
+/* media */
+@media(max-width:567px) {
+  .bs-stepper-header {overflow-x: scroll;}
+  .navbar {padding: 10px 0;}
+}

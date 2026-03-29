@@ -1,0 +1,31 @@
+.create_ad {background-color: #fff;}
+:global(.bs-stepper .step-trigger) {font-weight: normal;}
+:global(.bs-stepper .active .bs-stepper-circle) {background-color: var(--sub-color);}
+.car_images {
+    position: relative;
+    padding: 30px 20px;
+    background-color: #386bf62e;
+    border-radius: 10px;
+    margin: 10px 0 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    cursor: pointer;
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, .1);
+}
+.car_images svg ,.car_images span {
+    color: var(--sub-color);
+    margin: 5px 0;
+}
+.car_images span {font-size: small;}
+.car_images input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+input::placeholder,textarea::placeholder {color: #ccc !important;font-size: small;}

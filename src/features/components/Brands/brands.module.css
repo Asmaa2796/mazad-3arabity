@@ -1,0 +1,10 @@
+.brandCard img {
+    width: auto;
+    max-height: 70px !important;
+    margin: 30px auto;
+    display: block;
+}
+
+.brands .swiper {
+    height: 190px;
+}

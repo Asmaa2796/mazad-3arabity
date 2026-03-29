@@ -1,0 +1,71 @@
+.auction_details {background-color: var(--basic-color);}
+.car_swiper {
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--basic-color);
+  position: relative;
+  border: 1px solid #eee;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+  z-index: 1;
+}
+
+.new_auction {
+    background-color: rgb(11, 114, 11);
+    color: var(--basic-color);
+    border-radius: 25px;
+    position: absolute;
+    left: 10px;
+    top: 15px;
+    z-index: 9;
+    padding: 7px 20px 9px;
+    font-size: small;
+}
+.card_swiper {
+  height: 270px;
+}
+.car_img {
+  height: 270px;
+  background-size: cover;
+  background-position: center;
+}
+.car_info {
+    border-radius: 12px;
+    padding: 20px;
+  background-color: var(--basic-color);
+  border: 1px solid #eee;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+  width: 800px;
+  max-width: 90%;
+  margin: -50px auto 0;
+  z-index: 2;
+  position: relative;
+}
+.present_offer {
+  color: var(--basic-color);
+  padding: 10px 20px;
+  border-radius: 10px;
+  background-color: var(--sub-color);
+  width: 80%;
+  margin: auto;
+  display: block;
+  border: 1px solid transparent;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+}
+.accept_offer {
+  color: var(--basic-color);
+  padding: 10px 20px;
+  border-radius: 25px;
+  background-color: rgb(29, 135, 29);
+  width: 40%;
+  margin: auto;
+  font-size: small;
+  display: block;
+  border: 1px solid transparent;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+}
+.offer_card {
+    padding: 20px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}

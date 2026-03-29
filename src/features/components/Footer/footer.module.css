@@ -1,0 +1,13 @@
+.footer {
+  background: var(--main-color);
+  font-size: 0.95rem;
+}
+
+.footer h4, .footer h5 {
+  color: var(--basic-color);
+}
+
+.footer a:hover {
+  color: var(--sub-color);
+}
+footer img {width: auto;max-width: 130px;display: block;margin-bottom: 25px;}
