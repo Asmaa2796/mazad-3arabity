@@ -8,17 +8,17 @@ const Features = () => {
                 <div className='row'>
                     <div className='col-xl-4 col-lg-4 col-md-12 col-12'>
                         <div className={`${style.image} shadow-sm my-2 rounded-4 overflow-hidden`}>
-                            <img alt="image" src="./f1.png"/>
+                            <img alt="placeholder" src="./f1.png"/>
                         </div>
                     </div>
                     <div className='col-xl-4 col-lg-4 col-md-12 col-12'>
                         <div className={`${style.image} shadow-sm my-2 rounded-4 overflow-hidden`}>
-                            <img alt="image" src="./f2.png"/>
+                            <img alt="placeholder" src="./f2.png"/>
                         </div>
                     </div>
                     <div className='col-xl-4 col-lg-4 col-md-12 col-12'>
                         <div className={`${style.image} shadow-sm my-2 rounded-4 overflow-hidden`}>
-                            <img alt="image" src="./f3.png"/>
+                            <img alt="placeholder" src="./f3.png"/>
                         </div>
                     </div>
                 </div>

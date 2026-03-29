@@ -10,23 +10,23 @@ import {
 const SocialIcons = () => {
   return (
     <div className={style.social_fixed}>
-      <a href="#" className={`${style.icon} ${style.fb}`}>
+      <a href="https://www.google.com" className={`${style.icon} ${style.fb}`}>
         <IconBrandFacebook size={18} />
       </a>
 
-      <a href="#" className={`${style.icon} ${style.pin}`}>
+      <a href="https://www.google.com" className={`${style.icon} ${style.pin}`}>
         <IconBrandPinterest size={18} />
       </a>
 
-      <a href="#" className={`${style.icon} ${style.inst}`}>
+      <a href="https://www.google.com" className={`${style.icon} ${style.inst}`}>
         <IconBrandInstagram size={18} />
       </a>
 
-      <a href="#" className={`${style.icon} ${style.x}`}>
+      <a href="https://www.google.com" className={`${style.icon} ${style.x}`}>
         <IconBrandX size={18} />
       </a>
 
-      <a href="#" className={`${style.icon} ${style.gplus}`}>
+      <a href="https://www.google.com" className={`${style.icon} ${style.gplus}`}>
         <IconBrandGoogle size={18} />
       </a>
     </div>
