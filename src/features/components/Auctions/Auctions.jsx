@@ -5,8 +5,10 @@ import { IconCurrencyDollar, IconClock } from "@tabler/icons-react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 
 const Auctions = () => {
+    const { language, isArabic } = useLanguage();
     const auctions = [
         {
             id: 1,
@@ -46,6 +48,8 @@ const Auctions = () => {
 
                                 <div className={style.new_auction}>مزاد جديد</div>
                                 <Swiper
+                                    key={`${language}-${a.id}`}
+                                    dir={isArabic ? "rtl" : "ltr"}
                                     modules={[Autoplay, Pagination]}
                                     loop
                                     autoplay={{ delay: 2500, disableOnInteraction: false }}

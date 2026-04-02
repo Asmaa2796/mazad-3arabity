@@ -1,34 +1,32 @@
 import style from "./SocialIcons.module.css";
+import { useSelector } from "react-redux";
 import {
   IconBrandFacebook,
-  IconBrandPinterest,
   IconBrandInstagram,
   IconBrandX,
-  IconBrandGoogle,
+  IconBrandYoutube,
+  IconBrandTiktok,
+  IconBrandLinkedin,
 } from "@tabler/icons-react";
 
 const SocialIcons = () => {
+  const settings = useSelector((state) => state.content.settings.data);
+  const links = [
+    { href: settings?.facebook, className: style.fb, icon: <IconBrandFacebook size={18} /> },
+    { href: settings?.instagram, className: style.inst, icon: <IconBrandInstagram size={18} /> },
+    { href: settings?.xUrl, className: style.x, icon: <IconBrandX size={18} /> },
+    { href: settings?.youtube, className: style.gplus, icon: <IconBrandYoutube size={18} /> },
+    { href: settings?.tiktok, className: style.pin, icon: <IconBrandTiktok size={18} /> },
+    { href: settings?.linkedin, className: style.fb, icon: <IconBrandLinkedin size={18} /> },
+  ].filter((item) => Boolean(item.href));
+
   return (
     <div className={style.social_fixed}>
-      <a href="https://www.google.com" className={`${style.icon} ${style.fb}`}>
-        <IconBrandFacebook size={18} />
-      </a>
-
-      <a href="https://www.google.com" className={`${style.icon} ${style.pin}`}>
-        <IconBrandPinterest size={18} />
-      </a>
-
-      <a href="https://www.google.com" className={`${style.icon} ${style.inst}`}>
-        <IconBrandInstagram size={18} />
-      </a>
-
-      <a href="https://www.google.com" className={`${style.icon} ${style.x}`}>
-        <IconBrandX size={18} />
-      </a>
-
-      <a href="https://www.google.com" className={`${style.icon} ${style.gplus}`}>
-        <IconBrandGoogle size={18} />
-      </a>
+      {links.map((item, idx) => (
+        <a key={`${item.href}-${idx}`} href={item.href} target="_blank" rel="noreferrer" className={`${style.icon} ${item.className}`}>
+          {item.icon}
+        </a>
+      ))}
     </div>
   );
 };

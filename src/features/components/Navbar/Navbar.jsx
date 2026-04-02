@@ -1,7 +1,29 @@
-import { Link } from "react-router-dom";
-import { IconCar, IconMenu3, IconPlus, IconSearch, IconUser } from '@tabler/icons-react';
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { IconCar, IconMenu3, IconPlus, IconSearch } from '@tabler/icons-react';
 import Collapse from "bootstrap/js/dist/collapse";
+import { motion } from "framer-motion";
+import { useLanguage } from "../../../shared/i18n/LanguageProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProfile, logoutUser } from "../../../Redux/Slices/authSlice";
+
 const Navbar = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { token, user } = useSelector((state) => state.auth);
+    const settings = useSelector((state) => state.content.settings.data);
+    const { t, toggleLanguage } = useLanguage();
+    const links = [
+        { to: "/", label: t.nav.home },
+        { to: "/services", label: t.nav.services },
+        { to: "/mazad", label: t.nav.auctions },
+        { to: "/about-us", label: t.nav.about },
+        { to: "/privacy", label: t.nav.privacy },
+        { to: "/terms", label: t.nav.terms },
+        { to: "/faqs", label: t.nav.faqs },
+        { to: "/contact-us", label: t.nav.contact },
+    ];
+
     const handleNavLinkClick = () => {
         if (window.innerWidth < 992) {
             const navbarCollapse = document.getElementById("navbarNav");
@@ -11,44 +33,74 @@ const Navbar = () => {
             }
         }
     };
+
+    useEffect(() => {
+        if (token && !user) dispatch(fetchProfile());
+    }, [token, user, dispatch]);
+
+    const handleLogout = async () => {
+        await dispatch(logoutUser());
+        navigate("/login");
+    };
+
     return (
         <div className="">
             <div className="topbar sub-bg py-2 text-sm">
                 <div className="container">
                     <div className="d-flex justify-content-between">
-                        <div className="text-white"><IconCar size={17} /> سيارتك الجديدة في انتظارك… شارك في المزادات لحظة بلحظة.</div>
-                        <div className="text-white">English</div>
+                        <div className="text-white"><IconCar size={17} /> {t.nav.topbar}</div>
+                        <button type="button" className="btn btn-sm btn-light py-0 px-2" onClick={toggleLanguage}>
+                            {t.common.switchTo}
+                        </button>
                     </div>
                 </div>
             </div>
             <nav className="navbar navbar-expand-lg shadow-sm">
                 <div className="container">
-                    <Link className="navbar-brand" to="/"><img src="/logo.png" alt="Mazad Logo" /></Link>
+                    <Link className="navbar-brand" to="/"><img src={settings?.logo || "/logo.png"} alt={settings?.name || "Mazad Logo"} /></Link>
                     <button className="navbar-toggler text-white border-light-subtle" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <IconMenu3 color="var(--sub-color)" size={20} />
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNav">
                         <ul className="navbar-nav mx-auto p-0">
-                            <li className="nav-item">
-                                <Link className="nav-link" onClick={handleNavLinkClick} to="/">الرئيسية</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" onClick={handleNavLinkClick} to="/services">الخدمات</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" onClick={handleNavLinkClick} to="/mazad">المزادات</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" onClick={handleNavLinkClick} to="/about-us">عن مزاد عربيتي</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" onClick={handleNavLinkClick} to="/contact-us">تواصل معنا</Link>
-                            </li>
+                            {links.map((link) => (
+                                <li className="nav-item" key={link.to}>
+                                    <Link className="nav-link" onClick={handleNavLinkClick} to={link.to}>
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                         <div className="actions">
-                            <Link onClick={handleNavLinkClick} to="/create-ad" className="btn px-2 btn-success rounded-5 btn-sm shadow-sm text-sm mx-1"><IconPlus size={14} color="#fff" /> إضافة إعلان</Link>
-                            <button className="btn px-1 main-color btn-sm"><IconSearch size={17} color="#333" /></button>
-                            <button className="btn px-1 main-color btn-sm"><IconUser size={17} color="#333" /></button>
+                            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="d-inline-block mx-1">
+                                <Link onClick={handleNavLinkClick} to="/create-ad" className="btn px-2 btn-success rounded-5 btn-sm shadow-sm text-sm"><IconPlus size={14} color="#fff" /> {t.nav.createAd}</Link>
+                            </motion.div>
+                            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="btn px-1 main-color btn-sm"><IconSearch size={17} color="#333" /></motion.button>
+                            {token ? (
+                                <div className="dropdown d-inline-block">
+                                    <button className="btn p-0 border-0 bg-transparent" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img
+                                            src={user?.image || "/logo.png"}
+                                            alt={user?.name || "profile"}
+                                            width={34}
+                                            height={34}
+                                            className="rounded-circle border object-fit-cover"
+                                        />
+                                    </button>
+                                    <ul className="dropdown-menu">
+                                        <li>
+                                            <Link className="dropdown-item" to="/profile">{t.profile.visit}</Link>
+                                        </li>
+                                        <li>
+                                            <button className="dropdown-item" type="button" onClick={handleLogout}>{t.profile.logout}</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            ) : (
+                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="d-inline-block">
+                                    <Link to="/login" className="btn px-1 main-color btn-sm" aria-label={t.nav.login}>{t.nav.login}</Link>
+                                </motion.div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -57,3 +109,4 @@ const Navbar = () => {
     );
 }
 export default Navbar;
+

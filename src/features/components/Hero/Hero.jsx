@@ -8,51 +8,57 @@ import "swiper/css/pagination";
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../../../shared/i18n/LanguageProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchBanners } from "../../../Redux/Slices/contentSlice";
 
 const Hero = () => {
-  const slides = [
-    {
-      id: 1,
-      sup: "عروض",
-      title: "مزادات تتجدّد يوميًا",
-      titleColor: "main-color",
-      image: "./slide1.png",
-      linkBg: "main-bg",
-      linkColor: "main-color",
-      borderColor: "border-main",
-    },
-    {
-      id: 2,
-      sup: "اكتشف",
-      title: "أفضل الصفقات قبل ما تفوتك",
-      titleColor: "text-secondary",
-      image: "./slide2.png",
-      linkBg: "bg-secondary",
-      linkColor: "text-secondary",
-      borderColor: "border-secondary",
-    },
-    {
-      id: 3,
-      sup: "ابدأ",
-      title: "مزايدتك وامتلك عربيتك بثقة",
-      titleColor: "text-danger",
-      image: "./slide3.png",
-      linkBg: "bg-danger",
-      linkColor: "text-danger",
-      borderColor: "border-danger",
+  const { language, isArabic } = useLanguage();
+  const dispatch = useDispatch();
+  const bannersState = useSelector((state) => state.content.banners);
+  const prevClass = `hero-prev-${language}`;
+  const nextClass = `hero-next-${language}`;
+
+  useEffect(() => {
+    if (bannersState.status === "idle" || bannersState.language !== language) {
+      dispatch(fetchBanners());
     }
-  ];
+  }, [dispatch, bannersState.status, bannersState.language, language]);
+
+  const slides =
+    Array.isArray(bannersState.data) && bannersState.data.length > 0
+      ? bannersState.data.map((banner, index) => ({
+          id: banner.id || index + 1,
+          title: banner.title || "",
+          description: banner.description || " ",
+          titleColor: "main-color",
+          image: banner.image,
+          linkBg: "main-bg",
+          linkColor: "main-color",
+          borderColor: "border-main",
+        }))
+      : [];
 
   return (
     <div className={`${style.hero_section}`}>
       <div className="container">
+        {bannersState.status === "loading" ? (
+          <div className="text-center py-5">Loading...</div>
+        ) : null}
+        {bannersState.error ? (
+          <div className="alert alert-danger my-3">{bannersState.error}</div>
+        ) : null}
+        {slides.length === 0 ? null : (
         <Swiper
+          key={language}
+          dir={isArabic ? "rtl" : "ltr"}
           modules={[Autoplay, Navigation, Pagination]}
           loop={true}
           speed={1500}
           navigation={{
-            nextEl: ".next",
-            prevEl: ".prev",
+            nextEl: `.${nextClass}`,
+            prevEl: `.${prevClass}`,
           }}
           pagination={{ clickable: true }}
           autoplay={{
@@ -68,15 +74,15 @@ const Hero = () => {
               >
                 <div className={style.content}>
                   <div className="mb-5">
-                    <h1 className="text-dark">{slide.sup}</h1>
-                    <h1 className={slide.titleColor}>{slide.title}</h1>
+                    {slide.title ? <h1 className={slide.titleColor}>{slide.title}</h1> : null}
+                    {slide.description ? <p className="text-dark">{slide.description}</p> : null}
                   </div>
-                  <div className="d-flex">
-                    <Link className={`${style.hero_link} ${slide.linkBg}`}>
-                      مشاهدة المزيد <IconChevronLeft size={17} />
+                  <div className="d-flex pt-5 mt-5">
+                    <Link className={`${style.hero_link} ${slide.linkBg} mt-5`}>
+                      {isArabic ? "مشاهدة المزيد" : "View More"} <IconChevronLeft size={17} />
                     </Link>
-                    <Link className={`${style.hero_link_transparent} ${slide.borderColor} ${slide.linkColor}`}>
-                      اعرض عربيتك <IconChevronLeft size={17} />
+                    <Link className={`${style.hero_link_transparent} ${slide.borderColor} ${slide.linkColor} mt-5`}>
+                      {isArabic ? "اعرض عربيتك" : "List Your Car"} <IconChevronLeft size={17} />
                     </Link>
                   </div>
                 </div>
@@ -85,13 +91,14 @@ const Hero = () => {
           ))}
 
           {/* navigation buttons */}
-          <div className={`prev ${style.prev} ${style.nav_btn}`}>
+          <div className={`${prevClass} ${style.prev} ${style.nav_btn}`}>
             <IconChevronLeft size={17} />
           </div>
-          <div className={`next ${style.next} ${style.nav_btn}`}>
+          <div className={`${nextClass} ${style.next} ${style.nav_btn}`}>
             <IconChevronRight size={17} />
           </div>
         </Swiper>
+        )}
       </div>
     </div>
   );

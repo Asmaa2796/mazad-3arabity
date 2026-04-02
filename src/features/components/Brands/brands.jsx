@@ -4,47 +4,70 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { useLanguage } from "../../../shared/i18n/LanguageProvider";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBrands } from "../../../Redux/Slices/contentSlice";
 
 const Brands = () => {
-    const brands = [
-        { id: 1, brand: "./b1.png" },
-        { id: 2, brand: "./b2.png" },
-        { id: 3, brand: "./b3.png" },
-        { id: 4, brand: "./b4.png" },
-        { id: 5, brand: "./b5.png" },
-        { id: 6, brand: "./b6.png" }
-    ];
+    const { language, isArabic, t } = useLanguage();
+    const dispatch = useDispatch();
+    const brandsState = useSelector((state) => state.content.brands);
+    const [search, setSearch] = useState("");
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            dispatch(fetchBrands(search));
+        }, 350);
+        return () => clearTimeout(timer);
+    }, [dispatch, search, language]);
+
+    const brands = Array.isArray(brandsState.data) ? brandsState.data : [];
+    const swiperBreakpoints = {
+        320: { slidesPerView: 2 },
+        576: { slidesPerView: 3 },
+        768: { slidesPerView: 3 },
+        992: { slidesPerView: 5 },
+    };
 
     return (
         <div className={`${style.brands} py-5 bg-light`}>
             <div className="container">
                 <h2 className="text-center dark-color fw-medium mb-4">
-                   العلامات التجارية
+                    {t.brands?.title || (isArabic ? "العلامات التجارية" : "Brands")}
                 </h2>
+                <div className="mb-3">
+                    <input
+                        className="form-control"
+                        placeholder={t.brands?.searchPlaceholder || (isArabic ? "ابحث عن العلامة التجارية" : "Search brands")}
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
+                {brandsState.status === "loading" ? <div className="text-center py-3">{t.common.loading}</div> : null}
+                {brandsState.error ? <div className="alert alert-danger">{brandsState.error}</div> : null}
 
                 <Swiper
+                    key={language}
+                    dir={isArabic ? "rtl" : "ltr"}
                     className={style.swiper}
-                    modules={[Navigation, Pagination, Autoplay]}
+                    modules={[Navigation, Autoplay]}
                     spaceBetween={30}
                     slidesPerView={5}
                     autoplay={{ delay: 2000, disableOnInteraction: false }}
-                    pagination={{ clickable: true }}
+                    pagination={{ clickable: true   }}
                     loop={true}
-                    breakpoints={{
-                        320: { slidesPerView: 2 },
-                        576: { slidesPerView: 3 },
-                        768: { slidesPerView: 3 },
-                        992: { slidesPerView: 5 },
-                    }}
+                    breakpoints={swiperBreakpoints}
                 >
                     {brands.map((item) => (
                         <SwiperSlide key={item.id}>
                             <div className={`${style.brandCard} bg-white my-3 text-center rounded-3 border shadow-sm`}>
                                 <img
-                                    src={item.brand}
-                                    alt={item.id}
+                                    src={item.logo}
+                                    alt={item.name}
                                     className='d-block'
                                 />
+                                <div className="small text-secondary ">{item.name}</div>
                             </div>
                         </SwiperSlide>
                     ))}
