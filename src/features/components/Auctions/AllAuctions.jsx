@@ -4,7 +4,6 @@ import { Autoplay, Pagination } from "swiper/modules";
 import { IconCurrencyDollar, IconClock, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import "swiper/css";
 import "swiper/css/pagination";
-import { Link } from "react-router-dom";
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { fetchAuctions } from "../../../Redux/Slices/auctionsSlice";
 import { useDispatch, useSelector } from "react-redux";

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { fetchBanners } from './../../../Redux/Slices/contentSlice';
 const Features = () => {
-    const { language, isArabic, t } = useLanguage();
+    const { language, t } = useLanguage();
     const dispatch = useDispatch();
     const bannersState = useSelector((state) => state.content.banners);
 

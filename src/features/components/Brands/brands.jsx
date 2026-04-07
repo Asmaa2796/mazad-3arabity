@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
