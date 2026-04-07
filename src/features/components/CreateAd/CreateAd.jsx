@@ -29,7 +29,7 @@ const CreateAd = () => {
         description: '',
     });
     const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
+    // const [isLoading, setIsLoading] = useState(false);
     const [selectedCountryId, setSelectedCountryId] = useState(null);
 
     const brandOptions = brands.data?.map((b) => ({ value: b.id, label: b.name })) || [];

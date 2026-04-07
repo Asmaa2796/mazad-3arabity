@@ -53,17 +53,17 @@ const AuctionDetails = () => {
       remaining.minutes * 60 * 1000
     : null;
 
-  const handlePresentOffer = () => {
-    if (!user) {
-      toast.info(t.nav.please_login);
-      return;
-    }
-    if (user.role !== "seller") {
-      toast.warning(t.nav.please_create_buyer_account);
-      return;
-    }
-    // Proceed with offer logic here
-  };
+  // const handlePresentOffer = () => {
+  //   if (!user) {
+  //     toast.info(t.nav.please_login);
+  //     return;
+  //   }
+  //   if (user.role !== "seller") {
+  //     toast.warning(t.nav.please_create_buyer_account);
+  //     return;
+  //   }
+  //   // Proceed with offer logic here
+  // };
 
   return (
     <>

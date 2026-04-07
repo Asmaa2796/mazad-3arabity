@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IconCar, IconMenu3, IconPlus, IconSearch } from '@tabler/icons-react';
 import Collapse from "bootstrap/js/dist/collapse";

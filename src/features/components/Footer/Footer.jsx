@@ -4,7 +4,7 @@ import { IconPhone,IconMail,IconWorld } from '@tabler/icons-react';
 import { useLanguage } from '../../../shared/i18n/LanguageProvider';
 import { useSelector } from 'react-redux';
 const Footer = () => {
-    const { t,isArabic } = useLanguage();
+    const { t } = useLanguage();
     const settings = useSelector((state) => state.content.settings.data);
     const links = [
         { to: "/", label: t.nav.home },
