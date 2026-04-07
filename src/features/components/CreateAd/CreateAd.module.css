@@ -1,6 +1,20 @@
 .create_ad {background-color: #fff;}
-:global(.bs-stepper .step-trigger) {font-weight: normal;}
 :global(.bs-stepper .active .bs-stepper-circle) {background-color: var(--sub-color);}
+
+:global(.bs-stepper .step-trigger.step-disabled) {
+  opacity: 0.6;
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+:global(.bs-stepper .step-trigger.step-disabled.active),
+:global(.bs-stepper .step.active .step-trigger.step-disabled) {
+  opacity: 1 !important;
+}
+
+:global(.bs-stepper .step-trigger) {
+  font-weight: normal;
+}
 .car_images {
     position: relative;
     padding: 30px 20px;
@@ -29,3 +43,4 @@
     opacity: 0;
 }
 input::placeholder,textarea::placeholder {color: #ccc !important;font-size: small;}
+

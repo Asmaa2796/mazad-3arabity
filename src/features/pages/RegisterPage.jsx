@@ -91,7 +91,12 @@ const RegisterPage = () => {
             <div className="col-md-6"><label className="form-label">{t.auth.password}</label><motion.input whileFocus={{ scale: 1.01 }} className="form-control" type="password" name="password" value={form.password} placeholder={t.auth.placeholders.password} onChange={handleChange} /></div>
             <div className="col-md-6"><label className="form-label">{t.auth.confirmPassword}</label><motion.input whileFocus={{ scale: 1.01 }} className="form-control" type="password" name="password_confirmation" value={form.password_confirmation} placeholder={t.auth.placeholders.confirmPassword} onChange={handleChange} /></div>
             <div className="col-12"><label className="form-label">{t.auth.image}</label><input className="form-control" type="file" name="image" accept=".jpg,.jpeg,.png,image/jpeg,image/png" onChange={handleChange} /></div>
-            <div className="col-12 form-check"><input className="form-check-input" id="accept_terms" type="checkbox" name="accept_terms" checked={form.accept_terms} onChange={handleChange} /><label htmlFor="accept_terms" className="form-check-label">{t.auth.acceptTerms}</label></div>
+            <div className="col-12">
+              <div className="form-check d-flex align-items-center p-0">
+                <input className="form-check-input float-none m-0" id="accept_terms" type="checkbox" name="accept_terms" checked={form.accept_terms} onChange={handleChange} />
+                <label htmlFor="accept_terms" className="form-check-label mx-1">{t.auth.acceptTerms}</label>
+              </div>
+            </div>
           </div>
 
           {(clientError || error) && <div className="alert alert-danger mb-0">{clientError || error}</div>}

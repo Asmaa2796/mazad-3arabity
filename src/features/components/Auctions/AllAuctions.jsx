@@ -4,29 +4,29 @@ import { Autoplay, Pagination } from "swiper/modules";
 import { IconCurrencyDollar, IconClock, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import "swiper/css";
 import "swiper/css/pagination";
-
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { fetchAuctions } from "../../../Redux/Slices/auctionsSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 const placeholder = "/car_placeholder.jpg";
 const Auctions = () => {
     const { language, isArabic, t } = useLanguage();
     const dispatch = useDispatch();
-    const { data, status, language: dataLanguage } = useSelector((state) => state.auctions.auctions);
+    const { data, status, language: dataLanguage, pagination } = useSelector((state) => state.auctions.auctions);
 
+    const [page, setPage] = useState(1);
     useEffect(() => {
-        if (status === "idle" || dataLanguage !== language) dispatch(fetchAuctions());
-    }, [status, dataLanguage, language, dispatch]);
+        if (status === "idle" || dataLanguage !== language) dispatch(fetchAuctions(page));
+    }, [status, dataLanguage, language, dispatch, page]);
 
     return (
         <div className={`${style.auctions} py-5`}>
             <div className="container">
-                <h2 className="text-center fw-medium mb-4">{t.auctions.title}</h2>
+                <h2 className="text-center fw-medium mb-4">{t.auctions.all}</h2>
 
                 <div className="row">
-                    {(data || []).slice(0, 3).map((auction, index) => (
+                    {(data || []).map((auction, index) => (
                         <div className="col-xl-4 col-lg-4 col-md-6 col-12" key={auction?.id || index}>
                             <a href={`/auction-details/${auction.id}`} className={`${style.auction_card} my-2 d-block bg-white`}>
 
@@ -83,7 +83,6 @@ const Auctions = () => {
                                             </span>
                                         </li>
                                     </ul>
-
                                     {auction?.status === "sold" ? (
                                         <button className={style.sold} disabled>{t.auctions.sold}</button>
                                     ) : (
@@ -91,18 +90,44 @@ const Auctions = () => {
                                             {t.auctions.bidding}
                                         </button>
                                     )}
+
                                 </div>
                             </a>
                         </div>
                     ))}
                 </div>
-                {data && (
-                    <div className="text-center">
-                        <Link to="/all-auctions" className={`${style.auction_link} mt-5`}>
-                            {isArabic ? "مشاهدة المزيد" : "View More"} {isArabic ? <IconChevronLeft size={17} /> : <IconChevronRight size={17} />}
-                        </Link>
+                {pagination?.last_page > 1 && (
+                    <div className={`${style.pagination} d-flex justify-content-center align-items-center gap-2 mt-4`}>
+
+                        <button
+                            className={style.page_btn}
+                            disabled={page === 1}
+                            onClick={() => setPage(page - 1)}
+                        >
+                            {isArabic ? <IconChevronRight size={17} /> : <IconChevronLeft size={17} />}
+                        </button>
+
+                        {Array.from({ length: pagination?.last_page || 0 }, (_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setPage(i + 1)}
+                                className={`${style.page_number} ${page === i + 1 ? style.active : ""}`}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+
+                        <button
+                            className={style.page_btn}
+                            disabled={page === pagination?.last_page}
+                            onClick={() => setPage(page + 1)}
+                        >
+                            {isArabic ? <IconChevronLeft size={17} /> : <IconChevronRight size={17} />}
+                        </button>
+
                     </div>
                 )}
+
             </div>
         </div>
     );

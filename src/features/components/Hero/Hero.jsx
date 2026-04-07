@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import { fetchBanners } from "../../../Redux/Slices/contentSlice";
 
 const Hero = () => {
-  const { language, isArabic } = useLanguage();
+  const { language, isArabic ,t} = useLanguage();
   const dispatch = useDispatch();
   const bannersState = useSelector((state) => state.content.banners);
   const prevClass = `hero-prev-${language}`;
@@ -44,7 +44,7 @@ const Hero = () => {
     <div className={`${style.hero_section}`}>
       <div className="container">
         {bannersState.status === "loading" ? (
-          <div className="text-center py-5">Loading...</div>
+          <div className="text-center py-5">{t.common.loading}</div>
         ) : null}
         {bannersState.error ? (
           <div className="alert alert-danger my-3">{bannersState.error}</div>
