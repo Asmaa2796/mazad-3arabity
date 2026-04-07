@@ -42,7 +42,7 @@ const ProfilePage = () => {
 
         <div className="row g-3 mb-4">
           <div className="col-md-6"><strong>{t.profile.name}:</strong> {user?.name || "-"}</div>
-          <div className="col-md-6"><strong>{t.profile.role}:</strong> {user?.role || "-"}</div>
+          <div className="col-md-6"><strong>{t.profile.role}:</strong> {user?.role === "seller" ? t.profile.seller : t.profile.buyer}</div>
           <div className="col-md-6"><strong>{t.profile.phone}:</strong> {user?.phone || "-"}</div>
           <div className="col-md-6"><strong>{t.profile.email}:</strong> {user?.email || "-"}</div>
         </div>

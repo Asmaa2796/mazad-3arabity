@@ -10,9 +10,12 @@ import ScrollToTopButton from "./shared/components/ScrollToTopButton";
 import { pageTransition } from "./shared/animations/motion";
 import { useLanguage } from "./shared/i18n/LanguageProvider";
 import { fetchSettings } from "./Redux/Slices/contentSlice";
-
+import { ToastContainer } from "react-toastify";
+import ProtectedRoute from "./features/components/ProtectedRoute/ProtectedRoute";
+import AuthRoute from "./features/components/ProtectedRoute/AuthRoute";
 const Home = lazy(() => import("./features/components/Home/Home"));
 const AuctionDetails = lazy(() => import("./features/components/AuctionDetails/AuctionDetails"));
+const AllAuctions = lazy(() => import("./features/components/Auctions/AllAuctions"));
 const CreateAd = lazy(() => import("./features/components/CreateAd/CreateAd"));
 const AboutPage = lazy(() => import("./features/pages/AboutPage"));
 const PrivacyPage = lazy(() => import("./features/pages/PrivacyPage"));
@@ -65,8 +68,8 @@ function App() {
 
   return (
     <>
-      <Navbar/>
-      <PageTop/>
+      <Navbar />
+      <PageTop />
       <Suspense fallback={<div className="text-center py-5">{t.common.loading}</div>}>
         <AnimatePresence mode="wait">
           <motion.div
@@ -83,20 +86,34 @@ function App() {
               <Route path="/terms-conditions" element={<Navigate to="/terms" replace />} />
               <Route path="/faqs" element={<FaqsPage />} />
               <Route path="/contact-us" element={<ContactPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/login" element={
+                <AuthRoute>
+                  <LoginPage />
+                </AuthRoute>
+              } />
+              <Route path="/register" element={
+                <AuthRoute>
+                  <RegisterPage />
+                </AuthRoute>
+              } />
               <Route path="/verify-otp" element={<VerifyOtpPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/create-ad" element={<CreateAd />} />
+              <Route path="/create-ad" element={
+                <ProtectedRoute allowedRoles={["seller"]}>
+                  <CreateAd />
+                </ProtectedRoute>
+              } />
               <Route path="/auction-details/:id" element={<AuctionDetails />} />
+              <Route path="/all-auctions" element={<AllAuctions />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </motion.div>
         </AnimatePresence>
       </Suspense>
-      <SocialIcons/>
+      <SocialIcons />
       <ScrollToTopButton />
-      <Footer/>
+      <Footer />
+      <ToastContainer autoClose={2000} />
     </>
   );
 }

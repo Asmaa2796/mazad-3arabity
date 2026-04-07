@@ -4,12 +4,12 @@ import { IconPhone,IconMail,IconWorld } from '@tabler/icons-react';
 import { useLanguage } from '../../../shared/i18n/LanguageProvider';
 import { useSelector } from 'react-redux';
 const Footer = () => {
-    const { t } = useLanguage();
+    const { t,isArabic } = useLanguage();
     const settings = useSelector((state) => state.content.settings.data);
     const links = [
         { to: "/", label: t.nav.home },
         { to: "/services", label: t.nav.services },
-        { to: "/mazad", label: t.nav.auctions },
+        { to: "/all-auctions", label: t.nav.auctions },
         { to: "/about-us", label: t.nav.about },
         { to: "/privacy", label: t.nav.privacy },
         { to: "/terms", label: t.nav.terms },
@@ -41,7 +41,7 @@ const Footer = () => {
 
                     <div className="col-md-4 mb-4">
                         <h5 className="fw-semibold mb-3">{t.footer.stayConnected}</h5>
-                        <p className="text-white-50 mb-1"><IconPhone className='sub-color' size={18}/> {settings?.phone || "+1 (555) 123-4567"}</p>
+                        <p className="text-white-50 mb-1"><IconPhone className='sub-color' size={18}/> <span className='d-inline-block' style={{direction:"ltr"}}>{settings?.phone || "+1 (555) 123-4567"}</span></p>
                         <p className="text-white-50 mb-1"><IconMail className='sub-color' size={18}/> {settings?.support || settings?.email}</p>
                         <p className="text-white-50"><IconWorld className='sub-color' size={18}/> {settings?.address || "www.mazad.com"}</p>
                     </div>

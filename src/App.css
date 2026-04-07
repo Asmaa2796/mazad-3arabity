@@ -193,7 +193,8 @@ a {
 .swiper-pagination-horizontal.swiper-pagination-bullets {
      bottom: 7% !important;
 }
-
+/* LTR */
+[dir='ltr'] .dropdown-menu[data-bs-popper] {left: unset;right: 0;}
 /* media */
 @media(max-width:567px) {
   .bs-stepper-header {overflow-x: scroll;}
