@@ -12,12 +12,21 @@ const placeholder = "/car_placeholder.jpg";
 const Auctions = () => {
     const { language, isArabic, t } = useLanguage();
     const dispatch = useDispatch();
-    const { data, status, language: dataLanguage, pagination } = useSelector((state) => state.auctions.auctions);
+    const { data, language: dataLanguage, pagination } = useSelector((state) => state.auctions.auctions);
 
     const [page, setPage] = useState(1);
     useEffect(() => {
-        if (status === "idle" || dataLanguage !== language) dispatch(fetchAuctions(page));
-    }, [status, dataLanguage, language, dispatch, page]);
+        dispatch(fetchAuctions(page));
+    }, [dispatch, page, dataLanguage]);
+    useEffect(() => {
+        setPage(1);
+    }, [language]);
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }, [page]);
 
     return (
         <div className={`${style.auctions} py-5`}>
@@ -71,15 +80,32 @@ const Auctions = () => {
                                             <span className="mx-1">
                                                 {t.auctions.timeLeft} :
                                             </span>
-                                            <span className="mx-1">
-                                                {auction?.remaining_time?.days || "0"} {t.auctions.days}
-                                            </span>
-                                            <span className="mx-1">
-                                                {auction?.remaining_time?.hours || "0"} {t.auctions.hours}
-                                            </span>
-                                            <span className="mx-1">
-                                                {auction?.remaining_time?.minutes || "0"} {t.auctions.minutes}
-                                            </span>
+                                            {auction?.status === "active" ? (
+                                                <>
+                                                    <span className="mx-1">
+                                                        {auction?.remaining_time?.days || "0"} {t.auctions.days}
+                                                    </span>
+                                                    <span className="mx-1">
+                                                        {auction?.remaining_time?.hours || "0"} {t.auctions.hours}
+                                                    </span>
+                                                    <span className="mx-1">
+                                                        {auction?.remaining_time?.minutes || "0"} {t.auctions.minutes}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="mx-1">
+                                                        0 {t.auctions.days}
+                                                    </span>
+                                                    <span className="mx-1">
+                                                        0 {t.auctions.hours}
+                                                    </span>
+                                                    <span className="mx-1">
+                                                        0 {t.auctions.minutes}
+                                                    </span>
+                                                </>
+                                            )}
+
                                         </li>
                                     </ul>
                                     {auction?.status === "sold" ? (

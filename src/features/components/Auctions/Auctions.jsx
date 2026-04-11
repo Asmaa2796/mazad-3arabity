@@ -72,15 +72,32 @@ const Auctions = () => {
                                             <span className="mx-1">
                                                 {t.auctions.timeLeft} :
                                             </span>
-                                            <span className="mx-1">
-                                                {auction?.remaining_time?.days || "0"} {t.auctions.days}
-                                            </span>
-                                            <span className="mx-1">
-                                                {auction?.remaining_time?.hours || "0"} {t.auctions.hours}
-                                            </span>
-                                            <span className="mx-1">
-                                                {auction?.remaining_time?.minutes || "0"} {t.auctions.minutes}
-                                            </span>
+                                            {auction?.status === "active" ? (
+                                                <>
+                                                    <span className="mx-1">
+                                                        {auction?.remaining_time?.days || "0"} {t.auctions.days}
+                                                    </span>
+                                                    <span className="mx-1">
+                                                        {auction?.remaining_time?.hours || "0"} {t.auctions.hours}
+                                                    </span>
+                                                    <span className="mx-1">
+                                                        {auction?.remaining_time?.minutes || "0"} {t.auctions.minutes}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="mx-1">
+                                                        0 {t.auctions.days}
+                                                    </span>
+                                                    <span className="mx-1">
+                                                        0 {t.auctions.hours}
+                                                    </span>
+                                                    <span className="mx-1">
+                                                        0 {t.auctions.minutes}
+                                                    </span>
+                                                </>
+                                            )}
+
                                         </li>
                                     </ul>
 

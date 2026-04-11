@@ -125,6 +125,45 @@ a {
 .b25 {
   border-radius: 25px !important;
 }
+select {
+  background-image: url(../public/arrow.png) !important;
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+  background-position: left 14px center !important;
+}
+[dir='ltr'] select {
+  background-position: right 14px center !important;
+}
+.notify_icon {position: relative;color: var(--sub-color);margin-inline: 5px;}
+.pulse {
+    background: rgb(237, 52, 35);
+    border-radius: 50%;
+    height: 10px;
+    width: 10px;
+    box-shadow: 0 0 0 0 rgba(222, 84, 72, 1);
+    transform: scale(1);
+    animation: pulse 2s infinite;
+    position: absolute;
+    top: -3px;
+    right: -3px;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(222, 84, 72, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 15px rgba(222, 84, 72, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(222, 84, 72, 0);
+    }
+}
 /* navbar */
 .navbar {padding: 0;background-color: var(--basic-color);}
 

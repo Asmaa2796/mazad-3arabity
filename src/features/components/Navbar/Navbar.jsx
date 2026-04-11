@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { IconCar, IconMenu3, IconPlus, IconSearch } from '@tabler/icons-react';
+import { IconBellRinging, IconCar, IconMenu3, IconPlus, IconSearch } from '@tabler/icons-react';
 import Collapse from "bootstrap/js/dist/collapse";
 import { motion } from "framer-motion";
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
@@ -94,6 +94,12 @@ const Navbar = () => {
                             ))}
                         </ul>
                         <div className="actions">
+                            {token && (
+                                <Link to="/notifications" className="notify_icon">
+                                <div className="pulse"></div>
+                                <IconBellRinging stroke={1} size={18}/>
+                                </Link>
+                            )}
                             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="d-inline-block mx-1">
                                 <Link onClick={handleCreateAdClick} to="/create-ad" className="btn px-2 btn-success rounded-5 btn-sm shadow-sm text-sm"><IconPlus size={14} color="#fff" /> {t.nav.createAd}</Link>
                             </motion.div>
