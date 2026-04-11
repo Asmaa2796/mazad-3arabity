@@ -55,7 +55,7 @@ const AuctionDetails = () => {
       audio.volume = 1;
       audio.play().catch(() => { });
       toast.success(postBidState.data?.message || t.auctions.bid_submitted_successfully, {
-        onClose: () => window.location.reload
+        onClose: () => window.location.reload()
       });
 
       const modalEl = document.getElementById("presentOfferModal");
