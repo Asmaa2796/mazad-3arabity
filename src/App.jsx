@@ -13,6 +13,7 @@ import { fetchSettings } from "./Redux/Slices/contentSlice";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./features/components/ProtectedRoute/ProtectedRoute";
 import AuthRoute from "./features/components/ProtectedRoute/AuthRoute";
+import NotificationsPage from "./features/pages/Notifications";
 const Home = lazy(() => import("./features/components/Home/Home"));
 const AuctionDetails = lazy(() => import("./features/components/AuctionDetails/AuctionDetails"));
 const AllAuctions = lazy(() => import("./features/components/Auctions/AllAuctions"));
@@ -86,6 +87,7 @@ function App() {
               <Route path="/terms-conditions" element={<Navigate to="/terms" replace />} />
               <Route path="/faqs" element={<FaqsPage />} />
               <Route path="/contact-us" element={<ContactPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/login" element={
                 <AuthRoute>
                   <LoginPage />
