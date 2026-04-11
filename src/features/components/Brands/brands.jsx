@@ -17,7 +17,7 @@ const Brands = () => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            dispatch(fetchBrands(search));
+            dispatch(fetchBrands({ lang: language ,search}));
         }, 350);
         return () => clearTimeout(timer);
     }, [dispatch, search, language]);

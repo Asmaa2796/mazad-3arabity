@@ -2,6 +2,7 @@ import style from "./AuctionDetails.module.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import Countdown from "react-countdown";
+import * as bootstrap from 'bootstrap';
 import "swiper/css";
 import "swiper/css/pagination";
 import {
@@ -13,22 +14,33 @@ import {
   IconClock,
   IconPhone,
   IconTrophy,
+  IconCalendarEvent,
+  IconMapPin,
+  IconFileDescription,
+  IconPhoto,
+  IconInfoSquare,
+  IconMinus,
+  IconInfoCircle,
+  IconPlus
 } from "@tabler/icons-react";
-import { fetchAllBids, fetchAuctionDetails } from "../../../Redux/Slices/auctionsSlice";
+import { acceptOffer, fetchAllBids, fetchAuctionDetails, postBid } from "../../../Redux/Slices/auctionsSlice";
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 const AuctionDetails = () => {
   const { id } = useParams();
   const { language, t } = useLanguage();
   const dispatch = useDispatch();
+  const [loadingBidId, setLoadingBidId] = useState(null);
   const { data: record, status, language: dataLanguage } =
     useSelector((state) => state.auctions.auctionDetails);
   const { data: bids } =
     useSelector((state) => state.auctions.allBids);
+  const postBidState = useSelector((state) => state.auctions.postBid);
+  const acceptOfferState = useSelector((state) => state.auctions.acceptOffer);
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -37,6 +49,36 @@ const AuctionDetails = () => {
       dispatch(fetchAllBids(id));
     }
   }, [status, dataLanguage, language, dispatch, id]);
+  useEffect(() => {
+    if (postBidState.status === "succeeded") {
+      const audio = new Audio("/notification.mp3");
+      audio.volume = 1;
+      audio.play().catch(() => { });
+      toast.success(postBidState.data?.message || t.auctions.bid_submitted_successfully, {
+        onClose: () => window.location.reload
+      });
+
+      const modalEl = document.getElementById("presentOfferModal");
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      if (modalInstance) modalInstance.hide();
+
+      setBidValue(0);
+    } else if (postBidState.status === "failed") {
+      toast.error(postBidState.error || t.auctions.failed_to_submit_bid);
+    }
+  }, [postBidState]);
+
+  useEffect(() => {
+    if (acceptOfferState.status === "succeeded") {
+      toast.success(acceptOfferState.data?.message || t.auctions.offer_accepted_successfully, {
+        onClose: () => window.location.reload()
+      });
+
+    } else if (acceptOfferState.status === "failed") {
+      toast.error(acceptOfferState.error || t.auctions.failed_to_accept_offer);
+    }
+  }, [acceptOfferState]);
+
   const images =
     record?.gallery?.length
       ? record.gallery
@@ -48,23 +90,76 @@ const AuctionDetails = () => {
 
   const targetDate = remaining
     ? Date.now() +
-      remaining.days * 24 * 60 * 60 * 1000 +
-      remaining.hours * 60 * 60 * 1000 +
-      remaining.minutes * 60 * 1000
+    remaining.days * 24 * 60 * 60 * 1000 +
+    remaining.hours * 60 * 60 * 1000 +
+    remaining.minutes * 60 * 1000
     : null;
 
-  // const handlePresentOffer = () => {
-  //   if (!user) {
-  //     toast.info(t.nav.please_login);
-  //     return;
-  //   }
-  //   if (user.role !== "seller") {
-  //     toast.warning(t.nav.please_create_buyer_account);
-  //     return;
-  //   }
-  //   // Proceed with offer logic here
-  // };
+  // present offer logic
+  const [bidValue, setBidValue] = useState(0); // start from 0
+  const highestBid = Number(record?.pricing?.highest_bid || 0);
 
+  const handleIncrease = () => setBidValue((prev) => prev + 1000); // optional increment
+  const handleDecrease = () => setBidValue((prev) => (prev - 1000 >= highestBid ? prev - 1000 : highestBid));
+
+  // check user before showing present offer modal or button
+  const handlePresentOffer = () => {
+    if (!user) {
+      toast.info(t.nav.please_login);
+      return;
+    }
+
+    if (user.role !== "buyer") {
+      toast.warning(t.nav.please_create_buyer_account);
+      return;
+    }
+
+    // User is valid, show Bootstrap modal using JS
+    const modalEl = document.getElementById("presentOfferModal");
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  };
+  const handleBidChange = (e) => {
+    let value = e.target.value;
+
+    value = value.replace(/\D/g, "");
+    setBidValue(value ? Number(value) : 0);
+  };
+  // handle submitting offer
+  const handleSubmitOffer = () => {
+
+    const price = Number(bidValue);
+
+    if (!price || price <= highestBid) {
+      toast.warning(t.auctions.validationHigherThanHighest);
+      return;
+    }
+
+    const payload = {
+      auction_id: id,
+      price,
+    };
+
+    dispatch(postBid(payload));
+  };
+
+  //  handle accept offer
+  const handleAcceptOffer = async (bidId) => {
+  if (loadingBidId) return;
+
+  setLoadingBidId(bidId);
+
+  try {
+    const response = await dispatch(acceptOffer(bidId)).unwrap();
+
+    toast.success(response?.message || t.common.success);
+
+  } catch (error) {
+    toast.error(error?.message || t.common.error);
+  } finally {
+    setLoadingBidId(null);
+  }
+};
   return (
     <>
       {status === "loading" ? (
@@ -226,103 +321,127 @@ const AuctionDetails = () => {
               >
                 <div className="p-4 my-3">
                   <div className="row">
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.carName}:</b>
-                      <p className="text-secondary my-2">{record?.model}</p>
+
+                    {/* Car Info Title */}
+                    <div className="col-12">
+                      <h5 className="mb-3"><IconInfoSquare size={20} className="me-2 sub-color" /> {t.auctions.carInfo}</h5>
                     </div>
 
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.description}:</b>
-                      <p className="text-secondary lh-base">
-                        {record?.description}
-                      </p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.carType}:</b>
-                      <p className="text-secondary lh-base">{record?.brand?.name}</p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.manufactureDate}:</b>
-                      <p className="text-secondary my-2">{record?.manufacture_date}</p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.sellingPrice}:</b>
-                      <p className="text-secondary my-2">
-                        {record?.pricing?.selling_price} {t.auctions.pounds}
-                      </p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.kilos}:</b>
-                      <p className="text-secondary my-2">
-                        {record?.kilos} {t.auctions.km}
-                      </p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.color}:</b>
-                      <p className="text-secondary my-2">{record?.color}</p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.startDate}:</b>
-                      <p className="text-secondary my-2">{record?.start_date}</p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.endDate}:</b>
-                      <p className="text-secondary my-2">{record?.end_date}</p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.startPrice}:</b>
-                      <p className="text-secondary my-2">
-                        {record?.pricing?.min_increment} {t.auctions.pounds}
-                      </p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.minBid}:</b>
-                      <p className="text-secondary my-2">
-                        {record?.pricing?.min_price} {t.auctions.pounds}
-                      </p>
-                    </div>
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.address}:</b>
-                      <p className="text-secondary my-2">
-                        {record?.address}
-                      </p>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.report}:</b>
-                      <div className="d-flex align-items-center my-2">
-                        <img
-                          alt="placeholder"
-                          className="object-fit-cover"
-                          src="/pdf.png"
-                          style={{ width: "30px", height: "30px" }}
-                        />
-                        <span className="mx-2 text-sm">
-                          <Link to={record?.report} target="_blank" rel="noopener noreferrer">{t.auctions.link}</Link>
-                        </span>
-                        {/* <small className="text-success">
-                          ({t.auctions.reportSize})
-                        </small> */}
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-12">
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.carName}:</b>
+                        <p className="text-secondary mt-2 mb-0">{record?.model}</p>
                       </div>
                     </div>
 
-                    <div className="col-xl-12"></div>
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-12">
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.carType}:</b>
+                        <p className="text-secondary mt-2 mb-0">{record?.brand?.name}</p>
+                      </div>
+                    </div>
+
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-12">
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.manufactureDate}:</b>
+                        <p className="text-secondary mt-2 mb-0">{record?.manufacture_date}</p>
+                      </div>
+                    </div>
+
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-12">
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.kilos}:</b>
+                        <p className="text-secondary mt-2 mb-0">
+                          {record?.kilos} {t.auctions.km}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-12">
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.color}:</b>
+                        <p className="text-secondary mt-2 mb-0">{record?.color}</p>
+                      </div>
+                    </div>
+
+                    {/* Pricing */}
+                    {/* <div className="col-12 mt-3">
+                      <h5 className="mb-3"><IconCash size={20} className="me-2 sub-color" /> {t.auctions.pricingInfo}</h5>
+                    </div>
 
                     <div className="col-xl-6 col-lg-6 col-md-6 col-12">
-                      <b className="d-block fw-medium">{t.auctions.carImages}:</b>
-                      <div className="d-flex flex-wrap">
+                      <div className="alert alert-primary px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.sellingPrice}:</b>
+                        <p className="text-secondary mt-2 mb-0">
+                          {record?.pricing?.selling_price} {t.auctions.pounds}
+                        </p>
+                      </div>
+                    </div> */}
+
+                    {/* Dates */}
+                    <div className="col-12 mt-3">
+                      <h5 className="mb-3"><IconCalendarEvent size={20} className="me-2 sub-color" /> {t.auctions.auctionDates}</h5>
+                    </div>
+
+                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.startDate}:</b>
+                        <p className="text-secondary mt-2 mb-0">{record?.start_date}</p>
+                      </div>
+                    </div>
+
+                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.endDate}:</b>
+                        <p className="text-secondary mt-2 mb-0">{record?.end_date}</p>
+                      </div>
+                    </div>
+
+                    {/* Location */}
+                    <div className="col-12 mt-3">
+                      <h5 className="mb-3"><IconMapPin size={20} className="me-2 sub-color" /> {t.auctions.locationInfo}</h5>
+                    </div>
+
+                    <div className="col-xl-6 col-lg-6 col-md-6 col-12">
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <b className="d-block fw-normal">{t.auctions.address}:</b>
+                        <p className="text-secondary mt-2 mb-0">{record?.address}</p>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="col-12 mt-3">
+                      <h5 className="mb-3"><IconFileDescription size={20} className="me-2 sub-color" /> {t.auctions.description}</h5>
+                      <div className="bg-light px-4 py-2 rounded-3 my-2">
+                        <p className="text-secondary lh-base mb-0">
+                          {record?.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Report */}
+                    <div className="col-12 mt-3">
+                      <h5 className="mb-3">{t.auctions.report}</h5>
+                      <div className="bg-light px-4 py-2 rounded-3 my-2 d-flex align-items-center">
+                        <img
+                          alt="pdf"
+                          src="/pdf.png"
+                          style={{ width: "30px", height: "30px" }}
+                        />
+                        <span className="mx-2">
+                          <Link to={record?.report} target="_blank">
+                            {t.auctions.link}
+                          </Link>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Images */}
+                    <div className="col-12 mt-3">
+                      <h5 className="mb-3"><IconPhoto size={20} className="me-2 sub-color" /> {t.auctions.carImages}</h5>
+                      <div className="bg-light px-4 py-2 rounded-3 my-2 d-flex flex-wrap">
                         {images?.map((i, index) => {
                           const imgSrc = i?.img || i?.image || i;
-
                           return (
                             <img
                               key={index}
@@ -335,6 +454,7 @@ const AuctionDetails = () => {
                         })}
                       </div>
                     </div>
+
                   </div>
                 </div>
               </div>
@@ -386,7 +506,18 @@ const AuctionDetails = () => {
                                 <span className="sub-color my-3 d-flex justify-content-center align-items-center fw-medium text-center" style={{ direction: "ltr" }}>
                                   {bid?.user?.phone} <IconPhone size={16} />
                                 </span>
-                                <button className={style.accept_offer}>{t.auctions.acceptOffer}</button>
+
+                                {record?.status === "active" && (
+                                  <button
+                                    className={style.accept_offer}
+                                    onClick={() => handleAcceptOffer(bid?.id)}
+                                    disabled={loadingBidId === bid?.id}
+                                  >
+                                    {loadingBidId === bid?.id
+                                      ? t.common.loading
+                                      : t.auctions.acceptOffer}
+                                  </button>
+                                )}
                               </>
                             )}
                           </div>
@@ -405,24 +536,14 @@ const AuctionDetails = () => {
             {record?.status === "sold" ? (
               <button className={style.sold} disabled>{t.auctions.sold}</button>
             ) : (
-              <button 
+              <button
+                type="button"
                 className={style.present_offer}
-                onClick={() => {
-                  if (!user) {
-                    toast.info(t.nav.please_login);
-                    return;
-                  }
-                  if (user.role === "seller") {
-                    toast.warning(t.nav.please_create_buyer_account);
-                    return;
-                  }
-                  // Proceed with offer logic here
-                }}
+                onClick={handlePresentOffer}
               >
                 {t.auctions.presentOffer}
               </button>
             )}
-
           </div>
         </div>
       ) : (
@@ -433,6 +554,100 @@ const AuctionDetails = () => {
           </div>
         </div>
       )}
+      {/* modal */}
+      <div
+        className="modal fade"
+        id="presentOfferModal"
+        tabIndex="-1"
+        aria-labelledby="presentOfferModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header d-flex justify-content-between align-items-center">
+              <h5 className="modal-title" id="presentOfferModalLabel">
+                {t.auctions.presentOffer}
+              </h5>
+              <button
+                type="button"
+                className="btn-close m-0"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              {/* Your present_offer_card JSX */}
+              <div className={style.present_offer_card}>
+                <small className="text-secondary d-block">
+                  {t.auctions.presentOffer}
+                </small>
+
+                <span className="text-dark d-block my-2">
+                  {t.auctions.currentHighestBid}
+                </span>
+
+                <strong className="sub-color">
+                  {highestBid} {t.auctions.pounds}
+                </strong>
+
+                <div className="d-flex align-items-center justify-content-evenly my-2">
+                  <button className={[style.increase, style.bid_value_btn].join(" ")} type="button" onClick={handleIncrease}>
+                    <IconPlus />
+                  </button>
+
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={bidValue}
+                    onChange={handleBidChange}
+                    onKeyDown={(e) => {
+                      if (e.key === "." || e.key === "e" || e.key === "-") {
+                        e.preventDefault();
+                      }
+                    }}
+                    className={`${style.bid_value} text-center`}
+                    placeholder={t.auctions.enterBid}
+                  />
+
+                  <button className={[style.decrease, style.bid_value_btn].join(" ")} type="button" onClick={handleDecrease}>
+                    <IconMinus />
+                  </button>
+                </div>
+
+                <span className="d-block mt-2 text-secondary text-sm">
+                  <IconInfoCircle size={16} className="text-danger me-2" />{" "}
+                  {t.auctions.minimumBid} 0 {t.auctions.pounds}
+                </span>
+
+                <div className="alert alert-info mt-2 text-sm">
+                  <IconInfoCircle className="sub-color me-2" size={16} />
+                  {t.auctions.extendAuctionNotice}
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                {t.auctions.cancel}
+              </button>
+              <button
+                className="btn btn-success px-4"
+                onClick={handleSubmitOffer}
+                disabled={postBidState.status === "loading"}
+              >
+                {postBidState.status === "loading"
+                  ? t.common.loading
+                  : t.createAd.confirm}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

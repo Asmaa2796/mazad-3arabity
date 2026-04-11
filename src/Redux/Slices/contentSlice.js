@@ -10,6 +10,9 @@ const createAsyncState = () => ({
   status: "idle",
   error: null,
   language: null,
+  pagination: null,
+  page: 1,
+  hasMore: true
 });
 
 const initialState = {
@@ -20,6 +23,7 @@ const initialState = {
   privacy: createAsyncState(),
   terms: createAsyncState(),
   faqs: createAsyncState(),
+  notifications: createAsyncState()
 };
 
 export const fetchSettings = createAsyncThunk("content/fetchSettings", async (_, thunkAPI) => {
@@ -54,10 +58,10 @@ export const fetchBanners = createAsyncThunk("content/fetchBanners", async (_, t
   }
 });
 
-export const fetchBrands = createAsyncThunk("content/fetchBrands", async (search = "", thunkAPI) => {
+export const fetchBrands = createAsyncThunk("content/fetchBrands", async ({ search = "", lang }, thunkAPI) => {
   try {
     const token = getToken();
-    const currentLang = getCurrentLanguage();
+    const currentLang = lang || getCurrentLanguage();
     const query = String(search || "").trim();
     const url = query ? `${BASE_URL}/brands?search=${encodeURIComponent(query)}` : `${BASE_URL}/brands`;
     const response = await axios.get(url, {
@@ -135,6 +139,29 @@ export const fetchFaqs = createAsyncThunk("content/fetchFaqs", async (_, thunkAP
     return thunkAPI.rejectWithValue(normalizeError(error));
   }
 });
+export const fetchNotifications = createAsyncThunk(
+  "content/fetchNotifications",
+  async (page = 1, thunkAPI) => {
+    try {
+      const token = getToken();
+      const currentLang = getCurrentLanguage();
+
+      const response = await axios.get(
+        `${BASE_URL}/notifications?page=${page}`,
+        {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            "Accept-Language": currentLang,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(normalizeError(error));
+    }
+  }
+);
 
 const setPending = (stateKey) => (state) => {
   state[stateKey].status = "loading";
@@ -142,10 +169,30 @@ const setPending = (stateKey) => (state) => {
 };
 
 const setFulfilled = (stateKey) => (state, action) => {
+  const payload = action.payload;
+
   state[stateKey].status = "succeeded";
-  state[stateKey].data = action.payload?.data ?? action.payload;
   state[stateKey].language = getCurrentLanguage();
   state[stateKey].error = null;
+
+  if (stateKey === "notifications") {
+    const newData = payload?.data ?? [];
+
+    const pagination = payload?.pagination?.pagination;
+
+    const currentPage = pagination?.current_page;
+    const lastPage = pagination?.last_page;
+
+    state.notifications.data = newData;
+
+    state.notifications.pagination = pagination;
+    state.notifications.page = currentPage;
+    state.notifications.hasMore = currentPage < lastPage;
+
+    return;
+  }
+
+  state[stateKey].data = payload?.data ?? payload;
 };
 
 const setRejected = (stateKey) => (state, action) => {
@@ -179,7 +226,10 @@ const contentSlice = createSlice({
       .addCase(fetchTerms.rejected, setRejected("terms"))
       .addCase(fetchFaqs.pending, setPending("faqs"))
       .addCase(fetchFaqs.fulfilled, setFulfilled("faqs"))
-      .addCase(fetchFaqs.rejected, setRejected("faqs"));
+      .addCase(fetchFaqs.rejected, setRejected("faqs"))
+      .addCase(fetchNotifications.pending, setPending("notifications"))
+      .addCase(fetchNotifications.fulfilled, setFulfilled("notifications"))
+      .addCase(fetchNotifications.rejected, setRejected("notifications"));
   },
 });
 

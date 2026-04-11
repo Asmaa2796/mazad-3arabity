@@ -96,3 +96,20 @@
 }
 
 .offer_card:has(.is_winner) {border: 2px solid #3fc73f;}
+
+.present_offer_card {
+  text-align: center;
+  padding: 20px;
+  margin: auto;
+}
+.bid_value_btn {
+  background: transparent;
+    border: 1px solid #ddd;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+}
+.bid_value_btn svg {width: 16px;font-weight: bold;}
+.bid_value {border: 1px solid #ddd;}
+.increase svg {color: rgb(60, 199, 60);}
+.decrease svg {color: rgb(212, 44, 44);}

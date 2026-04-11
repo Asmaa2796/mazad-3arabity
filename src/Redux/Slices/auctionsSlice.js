@@ -18,7 +18,9 @@ const initialState = {
   auctionDetails: createAsyncState(),
   allBids: createAsyncState(),
   countries: createAsyncState(),
-  governorates: createAsyncState()
+  postAuction: createAsyncState(),
+  postBid: createAsyncState(),
+  acceptOffer: createAsyncState()
 };
 
 export const fetchAuctions = createAsyncThunk("auctions/fetchAuctions", async (page = 1, thunkAPI) => {
@@ -60,6 +62,7 @@ export const fetchAuctionDetails = createAsyncThunk(
     }
   }
 );
+
 export const fetchAllBids = createAsyncThunk(
   "auctions/allBids",
   async (id, thunkAPI) => {
@@ -84,14 +87,13 @@ export const fetchAllBids = createAsyncThunk(
   }
 );
 
-export const fetchCountries = createAsyncThunk("auctions/fetchCountries", async (_, thunkAPI) => {
+export const fetchCountries = createAsyncThunk("auctions/fetchCountries", async (language, thunkAPI) => {
   try {
     const token = getToken();
-    const currentLang = getCurrentLanguage();
     const response = await axios.get(`${BASE_URL}/countries?per_page=100`, {
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        "Accept-Language": currentLang,
+        "Accept-Language": language,
       },
     });
     return response.data;
@@ -100,21 +102,86 @@ export const fetchCountries = createAsyncThunk("auctions/fetchCountries", async 
   }
 });
 
-export const fetchGovernorates = createAsyncThunk("auctions/fetchGovernorates", async (countryId, thunkAPI) => {
-  try {
-    const token = getToken();
-    const currentLang = getCurrentLanguage();
-    const response = await axios.get(`${BASE_URL}/governorates/${countryId}?per_page=100`, {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        "Accept-Language": currentLang,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(normalizeError(error));
+export const postAuction = createAsyncThunk(
+  "auctions/postAuction",
+  async (auctionData, thunkAPI) => {
+    try {
+      const token = getToken();
+      const currentLang = getCurrentLanguage();
+
+      // Create FormData for files
+      const formData = new FormData();
+      Object.keys(auctionData).forEach(key => {
+        if (key === 'gallery') {
+          auctionData[key].forEach((file, index) => {
+            if (file) formData.append(`gallery[${index}]`, file);
+          });
+        } else if (auctionData[key] instanceof File) {
+          formData.append(key, auctionData[key]);
+        } else if (auctionData[key] && auctionData[key].value !== undefined) {
+          // Select objects
+          formData.append(key, auctionData[key].value);
+        } else if (auctionData[key] !== null && auctionData[key] !== '') {
+          formData.append(key, auctionData[key]);
+        }
+      });
+
+      const response = await axios.post(`${BASE_URL}/auctions`, formData, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          "Accept-Language": currentLang,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(normalizeError(error));
+    }
   }
-});
+);
+export const postBid = createAsyncThunk(
+  "auctions/postBid",
+  async (bidData, thunkAPI) => {
+    try {
+      const token = getToken();
+      const currentLang = getCurrentLanguage();
+
+      const response = await axios.post(`${BASE_URL}/bids`, bidData, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          "Accept-Language": currentLang,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(normalizeError(error));
+    }
+  }
+);
+export const acceptOffer = createAsyncThunk(
+  "auctions/acceptOffer",
+  async (id, thunkAPI) => {
+    try {
+      const token = getToken();
+      const currentLang = getCurrentLanguage();
+
+      const response = await axios.post(`${BASE_URL}/bids/${id}/accept`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          "Accept-Language": currentLang,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(normalizeError(error));
+    }
+  }
+);
 
 const setPending = (stateKey) => (state) => {
   state[stateKey].status = "loading";
@@ -155,10 +222,21 @@ const auctionsSlice = createSlice({
       .addCase(fetchCountries.pending, setPending("countries"))
       .addCase(fetchCountries.fulfilled, setFulfilled("countries"))
       .addCase(fetchCountries.rejected, setRejected("countries"))
-      
-      .addCase(fetchGovernorates.pending, setPending("governorates"))
-      .addCase(fetchGovernorates.fulfilled, setFulfilled("governorates"))
-      .addCase(fetchGovernorates.rejected, setRejected("governorates"));
+
+      // postAuction cases
+      .addCase(postAuction.pending, setPending("postAuction"))
+      .addCase(postAuction.fulfilled, setFulfilled("postAuction"))
+      .addCase(postAuction.rejected, setRejected("postAuction"))
+
+      // postBid cases
+      .addCase(postBid.pending, setPending("postBid"))
+      .addCase(postBid.fulfilled, setFulfilled("postBid"))
+      .addCase(postBid.rejected, setRejected("postBid"))
+
+      // acceptOffer cases
+      .addCase(acceptOffer.pending, setPending("acceptOffer"))
+      .addCase(acceptOffer.fulfilled, setFulfilled("acceptOffer"))
+      .addCase(acceptOffer.rejected, setRejected("acceptOffer"));
   },
 });
 
