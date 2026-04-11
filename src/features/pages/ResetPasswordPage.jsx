@@ -1,39 +1,49 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../Redux/Slices/authSlice";
+import { resetPassword } from "../../Redux/Slices/authSlice";
 import { useLanguage } from "../../shared/i18n/LanguageProvider";
 
 const phoneRegex = /^\+\d{10,15}$/;
 const passwordRegex = /^\d{5,}$/;
 
-const LoginPage = () => {
+const ResetPasswordPage = () => {
   const { t } = useLanguage();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { status, error } = useSelector((state) => state.auth.login);
+  const { status, error, success } = useSelector((state) => state.auth.resetPassword);
   const loading = status === "loading";
 
-  const [form, setForm] = useState({ phone: "", password: "" });
+  const [form, setForm] = useState({
+    phone: localStorage.getItem("pending_forgot_phone") || "",
+    password: "",
+    password_confirmation: "",
+  });
   const [clientError, setClientError] = useState("");
 
-  const isDisabled = useMemo(
-    () => loading || Object.values(form).some((v) => !String(v).trim()),
+  useEffect(() => {
+    if (!localStorage.getItem("pending_forgot_phone")) {
+      navigate("/forgot-password");
+    }
+  }, [navigate]);
+
+  const isDisabled = useMemo(() => 
+    loading || !form.phone.trim() || !form.password.trim() || !form.password_confirmation.trim(),
     [form, loading]
   );
 
   const validate = () => {
-    if (!form.phone || !form.password) return t.auth.validation.required;
+    if (!form.phone || !form.password || !form.password_confirmation) return t.auth.validation.required;
     if (!phoneRegex.test(form.phone)) return t.auth.validation.invalidPhone;
-    if (!passwordRegex.test(form.password)) return t.auth.validation.weakPassword;
+    if (!passwordRegex.test(form.password)) return t.auth.validation.weakNewPassword || t.auth.validation.weakPassword;
+    if (form.password !== form.password_confirmation) return t.auth.validation.newPasswordMismatch || t.auth.validation.passwordMismatch;
     return "";
   };
 
   const handleChange = (e) => {
     setClientError("");
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -41,18 +51,10 @@ const LoginPage = () => {
     const validationError = validate();
     if (validationError) return setClientError(validationError);
 
-    const result = await dispatch(loginUser(form));
-    const responseCode = result?.payload?.code;
-    const responseStatus = result?.payload?.status;
-
-    if (responseCode === 415 || responseStatus === 415) {
-      navigate("/verify-otp");
-      return;
-    }
-
-    if (loginUser.fulfilled.match(result)) {
-      navigate("/");
-      return;
+    const result = await dispatch(resetPassword(form));
+    if (resetPassword.fulfilled.match(result)) {
+      localStorage.removeItem("pending_forgot_phone");
+      navigate("/login");
     }
   };
 
@@ -66,12 +68,10 @@ const LoginPage = () => {
       >
         <div className="auth-side">
           <div className="bg-white w-50 mx-auto p-2 d-flex justify-content-center rounded">
-
-        <img src="/logo.png" width={100} height={100} alt="Mazad Logo" className="mx-auto" />
+            <img src="/logo.png" width={100} height={100} alt="Mazad Logo" className="mx-auto" />
           </div>
-
-          <h1 className="h3 my-3 text-center">{t.auth.loginTitle}</h1>
-          <p className="mb-0 opacity-75 text-center">{t.auth.loginDesc}</p>
+          <h1 className="h3 my-3 text-center">{t.auth.resetPasswordTitle}</h1>
+          <p className="mb-0 opacity-75 text-center">{t.auth.resetPasswordDesc}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -89,7 +89,7 @@ const LoginPage = () => {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <label className="form-label">{t.auth.password}</label>
+            <label className="form-label">{t.auth.newPassword}</label>
             <motion.input
               whileFocus={{ scale: 1.01 }}
               className="form-control"
@@ -101,16 +101,27 @@ const LoginPage = () => {
             />
           </motion.div>
 
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+            <label className="form-label">{t.auth.confirmNewPassword}</label>
+            <motion.input
+              whileFocus={{ scale: 1.01 }}
+              className="form-control"
+              name="password_confirmation"
+              type="password"
+              placeholder={t.auth.placeholders.confirmPassword}
+              value={form.password_confirmation}
+              onChange={handleChange}
+            />
+          </motion.div>
+
           {(clientError || error) && <div className="alert alert-danger mb-0">{clientError || error}</div>}
+          {success && <div className="alert alert-success mb-0">{success}</div>}
 
           <div className="d-flex gap-2 flex-wrap">
             <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="btn btn-main-color px-4" disabled={isDisabled} type="submit">
               {loading ? t.contact.sending : t.auth.submitLogin}
             </motion.button>
-            <Link to="/register" className="btn btn-outline-primary">{t.auth.goToRegister}</Link>
-          </div>
-          <div className="text-center mt-3">
-            <Link to="/forgot-password" className="text-decoration-none text-primary fw-semibold">{t.auth.forgotPasswordTitle || "Forgot Password?"}</Link>
+            <Link to="/login" className="btn btn-outline-primary">{t.auth.goToLogin}</Link>
           </div>
         </form>
       </motion.section>
@@ -118,5 +129,5 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ResetPasswordPage;
 

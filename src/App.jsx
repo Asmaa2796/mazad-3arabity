@@ -28,6 +28,9 @@ const LoginPage = lazy(() => import("./features/pages/LoginPage"));
 const RegisterPage = lazy(() => import("./features/pages/RegisterPage"));
 const VerifyOtpPage = lazy(() => import("./features/pages/VerifyOtpPage"));
 const ProfilePage = lazy(() => import("./features/pages/ProfilePage"));
+const ForgotPasswordPage = lazy(() => import("./features/pages/ForgotPasswordPage"));
+const VerifyPasswordOtpPage = lazy(() => import("./features/pages/VerifyPasswordOtpPage"));
+const ResetPasswordPage = lazy(() => import("./features/pages/ResetPasswordPage"));
 
 function App() {
   const location = useLocation();
@@ -98,8 +101,31 @@ function App() {
                   <RegisterPage />
                 </AuthRoute>
               } />
-              <Route path="/verify-otp" element={<VerifyOtpPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/verify-otp" element={
+                <AuthRoute>
+                  <VerifyOtpPage />
+                </AuthRoute>
+              } />
+              <Route path="/forgot-password" element={
+                <AuthRoute>
+                  <ForgotPasswordPage />
+                </AuthRoute>
+              } />
+              <Route path="/forgot/verify-otp" element={
+                <AuthRoute>
+                  <VerifyPasswordOtpPage />
+                </AuthRoute>
+              } />
+              <Route path="/forgot/reset-password" element={
+                <AuthRoute>
+                  <ResetPasswordPage />
+                </AuthRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } />
               <Route path="/create-ad" element={
                 <ProtectedRoute allowedRoles={["seller"]}>
                   <CreateAd />

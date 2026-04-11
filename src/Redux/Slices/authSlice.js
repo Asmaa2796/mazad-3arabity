@@ -32,6 +32,10 @@ const initialState = {
   profile: { ...initialRequestState },
   updateProfile: { ...initialRequestState },
   logout: { ...initialRequestState },
+  forgotPassword: { ...initialRequestState },
+  verifyPasswordOtp: { ...initialRequestState },
+  resetPassword: { ...initialRequestState },
+  resendPasswordOtp: { ...initialRequestState },
   user: null,
   token: localStorage.getItem("token") || null,
 };
@@ -153,6 +157,67 @@ export const logoutUser = createAsyncThunk("auth/logoutUser", async (_, { reject
   }
 });
 
+export const forgotPassword = createAsyncThunk("auth/forgotPassword", async (payload, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+    formData.append("phone", payload.phone);
+
+    const response = await axios.post(`${BASE_URL}/forgot/password`, formData, {
+      headers: getHeaders({ "Content-Type": "multipart/form-data" }),
+    });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(parseError(error, "Failed to send forgot password request"));
+  }
+});
+
+export const verifyPasswordOtp = createAsyncThunk("auth/verifyPasswordOtp", async (payload, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+    formData.append("phone", payload.phone);
+    formData.append("token", payload.token);
+
+    const response = await axios.post(`${BASE_URL}/forgot/verify-otp`, formData, {
+      headers: getHeaders({ "Content-Type": "multipart/form-data" }),
+    });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(parseError(error, "Failed to verify password OTP"));
+  }
+});
+
+export const resetPassword = createAsyncThunk("auth/resetPassword", async (payload, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+    formData.append("phone", payload.phone);
+    formData.append("password", payload.password);
+    formData.append("password_confirmation", payload.password_confirmation);
+
+    const response = await axios.post(`${BASE_URL}/forgot/reset-password`, formData, {
+      headers: getHeaders({ "Content-Type": "multipart/form-data" }),
+    });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(parseError(error, "Failed to reset password"));
+  }
+});
+
+export const resendPasswordOtp = createAsyncThunk("auth/resendPasswordOtp", async (phone, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+    formData.append("phone", phone);
+
+    const response = await axios.post(`${BASE_URL}/forgot/resend-otp`, formData, {
+      headers: getHeaders({ "Content-Type": "multipart/form-data" }),
+    });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(parseError(error, "Failed to resend password OTP"));
+  }
+});
+
+
+
 const setPending = (state, key) => {
   state[key].status = "loading";
   state[key].error = null;
@@ -235,7 +300,19 @@ const authSlice = createSlice({
         setFail(state, "logout", action, "Failed to logout");
         state.user = null;
         state.token = null;
-      });
+      })
+      .addCase(forgotPassword.pending, (state) => setPending(state, "forgotPassword"))
+      .addCase(forgotPassword.fulfilled, (state, action) => setSuccess(state, "forgotPassword", action))
+      .addCase(forgotPassword.rejected, (state, action) => setFail(state, "forgotPassword", action, "Forgot password request failed"))
+      .addCase(verifyPasswordOtp.pending, (state) => setPending(state, "verifyPasswordOtp"))
+      .addCase(verifyPasswordOtp.fulfilled, (state, action) => setSuccess(state, "verifyPasswordOtp", action))
+      .addCase(verifyPasswordOtp.rejected, (state, action) => setFail(state, "verifyPasswordOtp", action, "Password OTP verification failed"))
+      .addCase(resetPassword.pending, (state) => setPending(state, "resetPassword"))
+      .addCase(resetPassword.fulfilled, (state, action) => setSuccess(state, "resetPassword", action))
+      .addCase(resetPassword.rejected, (state, action) => setFail(state, "resetPassword", action, "Password reset failed"))
+      .addCase(resendPasswordOtp.pending, (state) => setPending(state, "resendPasswordOtp"))
+      .addCase(resendPasswordOtp.fulfilled, (state, action) => setSuccess(state, "resendPasswordOtp", action))
+      .addCase(resendPasswordOtp.rejected, (state, action) => setFail(state, "resendPasswordOtp", action, "Resend password OTP failed"));
   },
 });
 

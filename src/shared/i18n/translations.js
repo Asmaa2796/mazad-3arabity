@@ -150,6 +150,18 @@ export const translations = {
       submitRegister: "Register",
       submitVerify: "Verify",
       resendOtp: "Resend OTP",
+      resendPasswordOtp: "Resend Password Reset OTP",
+      forgotPasswordTitle: "Forgot Password?",
+      second: "Second",
+      resendIn: "Resend in",
+      forgotPasswordDesc: "Enter your phone number to receive OTP for password reset.",
+      verifyPasswordOtpTitle: "Verify Password Reset OTP",
+      verifyPasswordOtpDesc: "Enter the 6-digit code sent to your phone.",
+      resetPasswordTitle: "Reset Password",
+      resetPasswordDesc: "Enter new password for your account.",
+      passwordOtp: "Password Reset OTP",
+      newPassword: "New Password",
+      confirmNewPassword: "Confirm New Password",
       goToRegister: "Create new account",
       goToLogin: "Already have an account?",
       goToVerify: "Go to OTP verification",
@@ -173,6 +185,9 @@ export const translations = {
         imageType: "Image must be JPG, JPEG, or PNG",
         imageSize: "Image size must be less than 4MB",
         otpLength: "OTP must be 6 digits",
+        passwordResetOtpLength: "Password reset OTP must be 6 digits",
+        weakNewPassword: "New password must be at least 5 digits",
+        newPasswordMismatch: "Password confirmation does not match",
       },
     },
     profile: {
@@ -235,7 +250,7 @@ export const translations = {
       step4Desc: "Please review all information before confirming your ad",
       reviewEdit: "Edit",
       submitted: "Ad submitted successfully!"
-    },
+    }
   },
   ar: {
     common: {
@@ -290,7 +305,7 @@ export const translations = {
     faq: {
       title: "الأسئلة الشائعة",
       desc: "إجابات لأكثر الأسئلة شيوعًا حول استخدام منصة المزاد.",
-      ctaTitle: "هل تحتاج مساعدة إضافية؟",
+      ctaTitle: "هل تحتاج مساعدة إضافية?",
       ctaText: "تواصل مع فريق الدعم وسنرد عليك بسرعة.",
     },
     notifications: {
@@ -388,6 +403,18 @@ export const translations = {
       submitRegister: "إنشاء حساب",
       submitVerify: "تأكيد",
       resendOtp: "إعادة إرسال الرمز",
+      resendPasswordOtp: "إعادة إرسال رمز إعادة تعيين كلمة المرور",
+      forgotPasswordTitle: "هل نسيت كلمة المرور؟",
+      second: "ثانية",
+      resendIn: "إعادة الإرسال خلال",
+      forgotPasswordDesc: "أدخل رقم هاتفك لاستلام رمز التحقق لإعادة تعيين كلمة المرور.",
+      verifyPasswordOtpTitle: "تأكيد رمز إعادة تعيين كلمة المرور",
+      verifyPasswordOtpDesc: "أدخل الرمز المكون من 6 أرقام المرسل إلى هاتفك.",
+      resetPasswordTitle: "إعادة تعيين كلمة المرور",
+      resetPasswordDesc: "أدخل كلمة المرور الجديدة لحسابك.",
+      passwordOtp: "رمز إعادة تعيين كلمة المرور",
+      newPassword: "كلمة المرور الجديدة",
+      confirmNewPassword: "تأكيد كلمة المرور الجديدة",
       goToRegister: "إنشاء حساب جديد",
       goToLogin: "لديك حساب بالفعل؟",
       goToVerify: "الذهاب لصفحة التحقق",
@@ -411,6 +438,9 @@ export const translations = {
         imageType: "الصورة يجب أن تكون JPG أو JPEG أو PNG",
         imageSize: "حجم الصورة يجب ألا يتجاوز 4MB",
         otpLength: "رمز التحقق يجب أن يكون 6 أرقام",
+        passwordResetOtpLength: "رمز إعادة تعيين كلمة المرور يجب أن يكون 6 أرقام",
+        weakNewPassword: "كلمة المرور الجديدة يجب أن تكون 5 أرقام على الأقل",
+        newPasswordMismatch: "تأكيد كلمة المرور الجديدة غير متطابق"
       },
     },
     profile: {
@@ -473,6 +503,6 @@ export const translations = {
       step4Desc: "يرجى مراجعة جميع المعلومات قبل تأكيد الإعلان",
       reviewEdit: "تعديل",
       submitted: "تم إرسال الإعلان بنجاح!"
-    },
-  },
+    }
+  }
 };
