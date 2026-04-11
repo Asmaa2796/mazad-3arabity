@@ -66,7 +66,7 @@ const AuctionDetails = () => {
     } else if (postBidState.status === "failed") {
       toast.error(postBidState.error || t.auctions.failed_to_submit_bid);
     }
-  }, [postBidState]);
+  }, [postBidState,t]);
 
   useEffect(() => {
     if (acceptOfferState.status === "succeeded") {
@@ -77,7 +77,7 @@ const AuctionDetails = () => {
     } else if (acceptOfferState.status === "failed") {
       toast.error(acceptOfferState.error || t.auctions.failed_to_accept_offer);
     }
-  }, [acceptOfferState]);
+  }, [acceptOfferState,t]);
 
   const images =
     record?.gallery?.length
