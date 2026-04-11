@@ -26,7 +26,9 @@ const ProfilePage = () => {
   };
 
   if (!token) {
-    return <div className="container py-5 text-center">Please login first.</div>;
+    return <div className="container py-5 text-center">
+    <div className="alert alert-warning">{t.nav.please_login}</div>
+    </div>;
   }
 
   return (
