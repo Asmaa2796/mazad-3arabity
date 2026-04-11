@@ -263,7 +263,7 @@ const CreateAd = () => {
             toastify.error(postAuctionState.error || "Something went wrong");
         }
 
-    }, [brands.status, countries.status, postAuctionState.status, navigate, dispatch, language,t]);
+    }, [brands.status, countries.status, postAuctionState.status, navigate, dispatch, language,t,postAuctionState.error]);
 
     useEffect(() => {
         const stepperEl = document.querySelector('#stepper');
