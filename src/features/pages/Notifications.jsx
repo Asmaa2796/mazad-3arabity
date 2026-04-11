@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { fetchNotifications } from "../../Redux/Slices/contentSlice";
@@ -19,19 +19,16 @@ const NotificationsPage = () => {
   const currentPage = pagination?.current_page || 1;
   const lastPage = pagination?.last_page || 1;
 
-  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    dispatch(fetchNotifications(1));
-    setPage(1);
-  }, [language, dispatch]);
+ useEffect(() => {
+  dispatch(fetchNotifications(1));
+}, [language, dispatch]);
 
-  const changePage = (newPage) => {
-    if (newPage < 1 || newPage > lastPage) return;
+const changePage = (newPage) => {
+  if (newPage < 1 || newPage > lastPage) return;
 
-    setPage(newPage);
-    dispatch(fetchNotifications(newPage));
-  };
+  dispatch(fetchNotifications(newPage));
+};
 
   return (
     <PageShell title={t.notifications.title}>
