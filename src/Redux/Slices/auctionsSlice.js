@@ -20,7 +20,8 @@ const initialState = {
   countries: createAsyncState(),
   postAuction: createAsyncState(),
   postBid: createAsyncState(),
-  acceptOffer: createAsyncState()
+  acceptOffer: createAsyncState(),
+  activeAuctionId: null,
 };
 
 export const fetchAuctions = createAsyncThunk("auctions/fetchAuctions", async (page = 1, thunkAPI) => {
@@ -204,7 +205,11 @@ const setRejected = (stateKey) => (state, action) => {
 const auctionsSlice = createSlice({
   name: "auctions",
   initialState,
-  reducers: {},
+  reducers: {
+    setActiveAuctionId: (state, action) => {
+    state.activeAuctionId = action.payload;
+  },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAuctions.pending, setPending("auctions"))
@@ -239,5 +244,5 @@ const auctionsSlice = createSlice({
       .addCase(acceptOffer.rejected, setRejected("acceptOffer"));
   },
 });
-
+export const { setActiveAuctionId } = auctionsSlice.actions;
 export default auctionsSlice.reducer;

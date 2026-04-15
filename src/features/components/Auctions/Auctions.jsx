@@ -103,7 +103,9 @@ const Auctions = () => {
 
                                     {auction?.status === "sold" ? (
                                         <button className={style.sold} disabled>{t.auctions.sold}</button>
-                                    ) : (
+                                    ) : auction?.remaining_time === null ?  (
+                                        <button className={style.sold} disabled>{t.auctions.auction_ended}</button>
+                                    ):(
                                         <button className={`${style.bid_btn} shadow-sm`}>
                                             {t.auctions.bidding}
                                         </button>

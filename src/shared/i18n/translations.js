@@ -119,7 +119,10 @@ export const translations = {
       bid_submitted_successfully: "Bid submitted successfully",
       offer_accepted_successfully: "Offer accepted successfully",
       failed_to_submit_bid: "Failed to submit bid",
-      failed_to_accept_offer: "Failed to accept offer"
+      failed_to_accept_offer: "Failed to accept offer",
+      auction_ended: "The auction time has ended",
+      new_auction: "New Auction",
+      please_renew_subscription: "Please renew your subscription"
     },
     brands: {
       title: "Brands",
@@ -372,7 +375,10 @@ export const translations = {
       bid_submitted_successfully: "تمت المزايدة بنجاح",
       offer_accepted_successfully: "تم قبول العرض بنجاح",
       failed_to_submit_bid: "لم تتم المزايدة",
-      failed_to_accept_offer: "لم يتم قبول العرض"
+      failed_to_accept_offer: "لم يتم قبول العرض",
+      auction_ended: "لقد انتهى وقت المزاد",
+      new_auction: "مزايدة جديدة",
+      please_renew_subscription: "يرجى تجديد اشتراكك"
     },
     brands: {
       title: "العلامات التجارية",

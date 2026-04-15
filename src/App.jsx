@@ -10,10 +10,13 @@ import ScrollToTopButton from "./shared/components/ScrollToTopButton";
 import { pageTransition } from "./shared/animations/motion";
 import { useLanguage } from "./shared/i18n/LanguageProvider";
 import { fetchSettings } from "./Redux/Slices/contentSlice";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import ProtectedRoute from "./features/components/ProtectedRoute/ProtectedRoute";
 import AuthRoute from "./features/components/ProtectedRoute/AuthRoute";
 import NotificationsPage from "./features/pages/Notifications";
+import { onMessageListener, requestFCMToken } from "./firebase/firebase-messaging";
+import { IconGavel } from "@tabler/icons-react";
+
 const Home = lazy(() => import("./features/components/Home/Home"));
 const AuctionDetails = lazy(() => import("./features/components/AuctionDetails/AuctionDetails"));
 const AllAuctions = lazy(() => import("./features/components/Auctions/AllAuctions"));
@@ -69,6 +72,28 @@ function App() {
       link.setAttribute("href", data.favicon);
     }
   }, [settings.data]);
+
+  // fcm message
+  useEffect(() => {
+    requestFCMToken().then((token) => {
+      if (token) {
+        // console.log("FCM TOKEN:", token);
+      }
+    });
+
+    onMessageListener((payload) => {
+      // console.log("Message received:", payload);
+      const audio = new Audio("/notification.mp3");
+      audio.volume = 1;
+      audio.play().catch(() => { });
+      toast.success(
+        <div className="d-flex align-items-center">
+          <IconGavel size={19} />
+          <span className="text-secondary mx-1">{payload?.notification?.title || t.auctions.new_auction}</span>
+        </div>
+      );
+    });
+  }, []);
 
   return (
     <>
