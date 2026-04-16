@@ -173,7 +173,7 @@ const AuctionDetails = () => {
   };
 
   syncAcceptToFirebase();
-}, [acceptOfferState.status, isAccepting, t, dispatch, id,acceptOfferState.error,acceptOfferState.data?.data]);
+}, [acceptOfferState.status, isAccepting, t, dispatch, id,acceptOfferState.error,acceptOfferState.data?.data,acceptOfferState?.data?.message]);
 
   const images =
     record?.gallery?.length
