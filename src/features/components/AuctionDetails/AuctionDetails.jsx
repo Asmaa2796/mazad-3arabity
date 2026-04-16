@@ -27,7 +27,7 @@ import { acceptOffer, fetchAuctionDetails, postBid } from "../../../Redux/Slices
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase/config";
@@ -119,7 +119,7 @@ const AuctionDetails = () => {
     };
 
     syncBidToFirebase();
-  }, [postBidState.status, t, dispatch,isSubmittingBid]);
+  }, [postBidState.status,postBidState.data,user?.id, t, dispatch,isSubmittingBid,id,postBidState.error]);
 
   useEffect(() => {
   const syncAcceptToFirebase = async () => {
@@ -173,7 +173,7 @@ const AuctionDetails = () => {
   };
 
   syncAcceptToFirebase();
-}, [acceptOfferState.status, isAccepting, t, dispatch, id]);
+}, [acceptOfferState.status, isAccepting, t, dispatch, id,acceptOfferState.error]);
 
   const images =
     record?.gallery?.length
