@@ -37,7 +37,7 @@ const Subscription = () => {
       toast.error(subscribe.error);
       dispatch(clearSubscriptionState("subscribe"));
     }
-  }, [subscribe.status, dispatch,subscribe.data?.data?.redirect_url,subscribe.error]);
+  }, [subscribe.status, dispatch,subscribe.data?.data?.redirect_url,subscribe.error,subscribe.success]);
 
   const handleSubscribe = () => {
     dispatch(subscribeUser());
