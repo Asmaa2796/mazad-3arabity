@@ -95,7 +95,7 @@ function App() {
       );
       dispatch(fetchNotifications());
     });
-  }, []);
+  }, [dispatch,t]);
 
   return (
     <>

@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile } from "../../Redux/Slices/authSlice";
@@ -38,7 +37,7 @@ const Subscription = () => {
       toast.error(subscribe.error);
       dispatch(clearSubscriptionState("subscribe"));
     }
-  }, [subscribe.status, dispatch]);
+  }, [subscribe.status, dispatch,subscribe.data?.data?.redirect_url,subscribe.error]);
 
   const handleSubscribe = () => {
     dispatch(subscribeUser());
