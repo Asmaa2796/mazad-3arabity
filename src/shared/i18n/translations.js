@@ -102,6 +102,7 @@ export const translations = {
       isWinner: "Winner",
       noAuctions: "No Auctions",
       link: "Link",
+      noReports: "No Reports",
       carInfo: "Car Information",
       pricingInfo: "Pricing Information",
       auctionDates: "Auction Dates",
@@ -204,7 +205,21 @@ export const translations = {
       visit: "Visit your profile",
       logout: "Logout",
       seller: "Seller",
-      buyer: "Buyer"
+      buyer: "Buyer",
+      subscription: "Subscription"
+    },
+    subscription: {
+      title: "Subscription",
+      subtitle: "Subscribe to unlock premium features and participate in exclusive auctions.",
+      subscribed: "You have active subscription.",
+      subscribed_title: "Subscribed!",
+      not_subscribed: "Subscribe now to access premium features.",
+      pay_subscribe: "Pay & Subscribe",
+      subscribing: "Subscribing...",
+      already_subscribed: "You are already subscribed to premium features.",
+      ends_at: "Subscription ends at",
+      subscription_price: "Subscription price",
+      the_subscription_ends_when_you_buy_or_sell_a_car: "The subscription ends when you buy or sell a car."
     },
     createAd: {
       title: "Create Auction Ad",
@@ -358,6 +373,7 @@ export const translations = {
       isWinner: "الفائز",
       noAuctions: "لا يوجد مزادات",
       link: "رابط",
+      noReports: "لا يوجد تقارير",
       carInfo: "معلومات السيارة",
       pricingInfo: "معلومات السعر",
       auctionDates: "تواريخ المزاد",
@@ -458,9 +474,23 @@ export const translations = {
       image: "صورة الحساب",
       update: "تحديث الملف الشخصي",
       visit: "زيارة ملفك الشخصي",
-      logout: "الخروج",
+      logout: "تسجيل خروج",
       seller: "بائع",
-      buyer: "مشتري"
+      buyer: "مشتري",
+      subscription: "الاشتراك"
+    },
+    subscription: {
+      title: "الاشتراك",
+      subtitle: "اشترك للوصول للمميزات المدفوعة والمزادات الحصرية.",
+      subscribed: "لديك اشتراك نشط.",
+      subscribed_title: "مُشترك!",
+      not_subscribed: "اشترك الآن للوصول للمميزات المدفوعة.",
+      pay_subscribe: "ادفع واشترك",
+      subscribing: "جاري الاشتراك...",
+      already_subscribed: "أنت مشترك بالفعل في المميزات المدفوعة.",
+      ends_at: "الاشتراك ينتهي في",
+      subscription_price: "سعر الاشتراك",
+      the_subscription_ends_when_you_buy_or_sell_a_car: "ينتهي الاشتراك عند شراء سيارة أو بيع سيارة"
     },
     createAd: {
       title: "إضافة إعلان عن مزاد",

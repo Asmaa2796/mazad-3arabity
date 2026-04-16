@@ -248,9 +248,7 @@ const CreateAd = () => {
         if (brands.status === 'idle') {
             dispatch(fetchBrands({ lang: language }));
         }
-        if (countries.status === 'idle') {
-            dispatch(fetchCountries());
-        }
+        
         if (postAuctionState.status === "succeeded") {
             toastify.success(t.createAd.submitted, {
                 onClose: () => {
@@ -261,9 +259,9 @@ const CreateAd = () => {
 
         if (postAuctionState.status === "failed") {
             toastify.error(postAuctionState.error || "Something went wrong");
-        }
+        } 
 
-    }, [brands.status, countries.status, postAuctionState.status, navigate, dispatch, language,t,postAuctionState.error]);
+    }, [brands.status, postAuctionState.status, navigate, dispatch, language,t,postAuctionState.error]);
 
     useEffect(() => {
         const stepperEl = document.querySelector('#stepper');

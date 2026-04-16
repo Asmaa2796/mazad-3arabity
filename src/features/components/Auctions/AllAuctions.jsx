@@ -47,7 +47,6 @@ const Auctions = () => {
                             <div className="col-xl-4 col-lg-4 col-md-6 col-12" key={auction?.id || index}>
                                 <a href={`/auction-details/${auction.id}`} className={`${style.auction_card} my-2 d-block bg-white`}>
 
-                                    {/* <div className={style.new_auction}>{t.auctions.new}</div> */}
                                     <Swiper
                                         key={`${language}-${auction.id}`}
                                         dir={isArabic ? "rtl" : "ltr"}

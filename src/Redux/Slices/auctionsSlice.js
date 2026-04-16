@@ -88,13 +88,13 @@ export const fetchAllBids = createAsyncThunk(
   }
 );
 
-export const fetchCountries = createAsyncThunk("auctions/fetchCountries", async (language, thunkAPI) => {
+export const fetchCountries = createAsyncThunk("auctions/fetchCountries", async (lang, thunkAPI) => {
   try {
     const token = getToken();
     const response = await axios.get(`${BASE_URL}/countries?per_page=100`, {
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        "Accept-Language": language,
+        "Accept-Language": lang,
       },
     });
     return response.data;
@@ -169,7 +169,7 @@ export const acceptOffer = createAsyncThunk(
       const token = getToken();
       const currentLang = getCurrentLanguage();
 
-      const response = await axios.post(`${BASE_URL}/bids/${id}/accept`, {
+      const response = await axios.post(`${BASE_URL}/bids/${id}/accept`,{}, {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           "Accept-Language": currentLang,

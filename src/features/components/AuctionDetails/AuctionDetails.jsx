@@ -29,7 +29,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import { listenAuctionBids } from "../../../firebase/realtime";
 
@@ -44,6 +44,27 @@ const AuctionDetails = () => {
   const postBidState = useSelector((state) => state.auctions.postBid);
   const acceptOfferState = useSelector((state) => state.auctions.acceptOffer);
   const { user } = useSelector((state) => state.auth);
+  const [isSubmittingBid, setIsSubmittingBid] = useState(false);
+  const [isAccepting, setIsAccepting] = useState(false);
+  const formatDateTime = (dateInput) => {
+    const date = new Date(dateInput);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+
+    const formattedHours = String(hours).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm}`;
+  };
 
   useEffect(() => {
     if (status === "idle" || dataLanguage !== language) {
@@ -51,34 +72,108 @@ const AuctionDetails = () => {
     }
   }, [status, dataLanguage, language, dispatch, id]);
   useEffect(() => {
-    if (postBidState.status === "succeeded") {
-      const audio = new Audio("/notification.mp3");
-      audio.volume = 1;
-      audio.play().catch(() => { });
-      toast.success(postBidState.data?.message || t.auctions.bid_submitted_successfully, {
-        onClose: () => window.location.reload()
-      });
+    const syncBidToFirebase = async () => {
+      if (!isSubmittingBid) return;
+      if (postBidState.status === "succeeded") {
+        setIsSubmittingBid(false);
+        const audio = new Audio("/notification.mp3");
+        audio.volume = 1;
+        audio.play().catch(() => { });
 
-      const modalEl = document.getElementById("presentOfferModal");
-      const modalInstance = bootstrap.Modal.getInstance(modalEl);
-      if (modalInstance) modalInstance.hide();
+        toast.success(
+          postBidState.data?.message || t.auctions.bid_submitted_successfully
+        );
 
-      setBidValue(0);
-    } else if (postBidState.status === "failed") {
-      toast.error(postBidState.error || t.auctions.failed_to_submit_bid);
-    }
-  }, [postBidState, t]);
+        const modalEl = document.getElementById("presentOfferModal");
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+
+        setBidValue(0);
+
+        // firebase
+        const bid = postBidState?.data;
+
+        if (bid) {
+          const ref = doc(db, "auction_bids", String(id));
+
+          await setDoc(
+            ref,
+            {
+              bids: arrayUnion({
+                id: bid.id,
+                bid_price: bid.price,
+                user_id: user?.id,
+                created_at: formatDateTime(new Date()),
+                accepted: false,
+              }),
+            },
+            { merge: true }
+          );
+        }
+        dispatch(fetchAuctionDetails(id));
+      }
+
+      if (postBidState.status === "failed") {
+        toast.error(postBidState.error || t.auctions.failed_to_submit_bid);
+      }
+    };
+
+    syncBidToFirebase();
+  }, [postBidState.status, t, dispatch,isSubmittingBid]);
 
   useEffect(() => {
-    if (acceptOfferState.status === "succeeded") {
-      toast.success(acceptOfferState.data?.message || t.auctions.offer_accepted_successfully, {
-        onClose: () => window.location.reload()
-      });
+  const syncAcceptToFirebase = async () => {
+    if (!isAccepting) return;
 
-    } else if (acceptOfferState.status === "failed") {
-      toast.error(acceptOfferState.error || t.auctions.failed_to_accept_offer);
+    if (acceptOfferState.status === "succeeded") {
+      setIsAccepting(false);
+      const audio = new Audio("/notification.mp3");
+        audio.volume = 1;
+        audio.play().catch(() => { });
+
+      toast.success(
+        acceptOfferState.data?.message ||
+        t.auctions.offer_accepted_successfully
+      );
+
+      const result = acceptOfferState.data?.data;
+      const bidId = result?.id;
+      const auctionId = result?.auction_id;
+
+      if (auctionId && bidId) {
+        const docRef = doc(db, "auction_bids", String(auctionId));
+        const snapshot = await getDoc(docRef);
+
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          const bids = data?.bids || [];
+
+          const updatedBids = bids.map((bid) => {
+            if (String(bid.id) === String(bidId)) {
+              return { ...bid, accepted: true };
+            }
+            return { ...bid, accepted: false };
+          });
+
+          await updateDoc(docRef, {
+            bids: updatedBids,
+          });
+        }
+      }
+
+      dispatch(fetchAuctionDetails(id));
     }
-  }, [acceptOfferState, t]);
+
+    if (acceptOfferState.status === "failed") {
+      setIsAccepting(false); 
+      toast.error(
+        acceptOfferState.error || t.auctions.failed_to_accept_offer
+      );
+    }
+  };
+
+  syncAcceptToFirebase();
+}, [acceptOfferState.status, isAccepting, t, dispatch, id]);
 
   const images =
     record?.gallery?.length
@@ -117,7 +212,7 @@ const AuctionDetails = () => {
     });
 
     return () => unsubscribe();
-  }, [id, language, record]);
+  }, [id]);
   // present offer logic
   const [bidValue, setBidValue] = useState(0); // start from 0
   const highestBid = Number(record?.pricing?.highest_bid || 0);
@@ -158,6 +253,7 @@ const AuctionDetails = () => {
       return;
     }
 
+    setIsSubmittingBid(true);
     const payload = {
       auction_id: id,
       price,
@@ -171,14 +267,13 @@ const AuctionDetails = () => {
     if (loadingBidId) return;
 
     setLoadingBidId(bidId);
+    setIsAccepting(true);
 
     try {
-      const response = await dispatch(acceptOffer(bidId)).unwrap();
-
-      toast.success(response?.message || t.common.success);
+      await dispatch(acceptOffer(bidId)).unwrap()
 
     } catch (error) {
-      toast.error(error?.message || t.common.error);
+      console.log(error?.message || t.common.error);
     } finally {
       setLoadingBidId(null);
     }
@@ -281,7 +376,7 @@ const AuctionDetails = () => {
                   <span className="text-secondary">{t.auctions.sold}</span>
                 ) : record?.remaining_time === null ? (
                   <span className="text-secondary">{t.auctions.auction_ended}</span>
-                ):(
+                ) : (
                   <Countdown
                     key={targetDate}
                     date={targetDate}
@@ -454,16 +549,22 @@ const AuctionDetails = () => {
                     <div className="col-12 mt-3">
                       <h5 className="mb-3">{t.auctions.report}</h5>
                       <div className="bg-light px-4 py-2 rounded-3 my-2 d-flex align-items-center">
-                        <img
-                          alt="pdf"
-                          src="/pdf.png"
-                          style={{ width: "30px", height: "30px" }}
-                        />
-                        <span className="mx-2">
-                          <Link to={record?.report} target="_blank">
-                            {t.auctions.link}
-                          </Link>
-                        </span>
+                        {record?.record ? (
+                          <>
+                            <img
+                              alt="pdf"
+                              src="/pdf.png"
+                              style={{ width: "30px", height: "30px" }}
+                            />
+                            <span className="mx-2">
+                              <Link to={record?.report} target="_blank">
+                                {t.auctions.link}
+                              </Link>
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-secondary">{t.auctions.noReports}</span>
+                        )}
                       </div>
                     </div>
 
@@ -576,23 +677,23 @@ const AuctionDetails = () => {
                 </div>
               </div>
             </div>
-              {record?.status === "sold" ? (
-                <button className={style.sold} disabled>
-                  {t.auctions.sold}
-                </button>
-              ) : record?.remaining_time === null ? (
-                <button className={style.sold} disabled>
-                  {t.auctions.auction_ended}
-                </button>
-              ) : !record?.meta?.is_owner && (
-                <button
-                  type="button"
-                  className={style.present_offer}
-                  onClick={handlePresentOffer}
-                >
-                  {t.auctions.presentOffer}
-                </button>
-              )}
+            {record?.status === "sold" ? (
+              <button className={style.sold} disabled>
+                {t.auctions.sold}
+              </button>
+            ) : record?.remaining_time === null ? (
+              <button className={style.sold} disabled>
+                {t.auctions.auction_ended}
+              </button>
+            ) : !record?.meta?.is_owner && (
+              <button
+                type="button"
+                className={style.present_offer}
+                onClick={handlePresentOffer}
+              >
+                {t.auctions.presentOffer}
+              </button>
+            )}
           </div>
         </div>
       ) : (

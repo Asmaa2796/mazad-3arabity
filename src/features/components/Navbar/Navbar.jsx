@@ -120,6 +120,9 @@ const Navbar = () => {
                                             <Link className="dropdown-item text-sm" to="/profile">{t.profile.visit}</Link>
                                         </li>
                                         <li>
+                                            <Link className="dropdown-item text-sm" to="/subscription">{t.profile.subscription}</Link>
+                                        </li>
+                                        <li>
                                             <button className="dropdown-item text-sm" type="button" onClick={handleLogout}>{t.profile.logout}</button>
                                         </li>
                                     </ul>

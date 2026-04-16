@@ -9,7 +9,7 @@ import PageTop from "./features/components/PageTop/PageTop";
 import ScrollToTopButton from "./shared/components/ScrollToTopButton";
 import { pageTransition } from "./shared/animations/motion";
 import { useLanguage } from "./shared/i18n/LanguageProvider";
-import { fetchSettings } from "./Redux/Slices/contentSlice";
+import { fetchNotifications, fetchSettings } from "./Redux/Slices/contentSlice";
 import { toast, ToastContainer } from "react-toastify";
 import ProtectedRoute from "./features/components/ProtectedRoute/ProtectedRoute";
 import AuthRoute from "./features/components/ProtectedRoute/AuthRoute";
@@ -34,6 +34,7 @@ const ProfilePage = lazy(() => import("./features/pages/ProfilePage"));
 const ForgotPasswordPage = lazy(() => import("./features/pages/ForgotPasswordPage"));
 const VerifyPasswordOtpPage = lazy(() => import("./features/pages/VerifyPasswordOtpPage"));
 const ResetPasswordPage = lazy(() => import("./features/pages/ResetPasswordPage"));
+const Subscription = lazy(() => import("./features/pages/Subscription"));
 
 function App() {
   const location = useLocation();
@@ -87,11 +88,12 @@ function App() {
       audio.volume = 1;
       audio.play().catch(() => { });
       toast.success(
-        <div className="d-flex align-items-center">
-          <IconGavel size={19} />
-          <span className="text-secondary mx-1">{payload?.notification?.title || t.auctions.new_auction}</span>
+        <div>
+          <span className="text-secondary mx-1 text-success d-block"><IconGavel size={19} /> {payload?.notification?.title || t.auctions.new_auction}</span>
+          <p className="text-secondary mx-1">{payload?.notification?.body}</p>
         </div>
       );
+      dispatch(fetchNotifications());
     });
   }, []);
 
@@ -149,6 +151,11 @@ function App() {
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/subscription" element={
+                <ProtectedRoute>
+                  <Subscription />
                 </ProtectedRoute>
               } />
               <Route path="/create-ad" element={
