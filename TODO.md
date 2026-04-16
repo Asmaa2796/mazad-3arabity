@@ -1,10 +1,13 @@
-# Auth Slice Forgot Password Functions Implementation
+# Subscription Feature Implementation Plan
 
-## Plan Steps:
-- [x] Step 1: Add the 4 new async thunks (forgotPassword, verifyPasswordOtp, resetPassword, resendPasswordOtp)
-- [x] Step 2: Add new state keys to initialState
-- [x] Step 3: Add extraReducers for the new thunks
-- [x] Step 4: Verify no linter errors and test logic (no errors shown, logic matches patterns)
-- [x] Complete: Test endpoints in app (implementation done; test manually via dispatch or UI)
+## Steps:
+- [x] 1. Create src/Redux/Slices/subscriptionSlice.js with subscribe asyncThunk (POST /subscriptions/subscribe using axios pattern)
+- [x] 2. Update src/Redux/store.js to import and combine subscriptionReducer
+- [x] 3. Create src/features/pages/Subscription.jsx page with is_subscribed check, subscribe button, redirect on success
+- [x] 4. Update src/App.jsx to add lazy Subscription import and /subscription route with ProtectedRoute
+- [x] 5. Update src/features/components/Navbar/Navbar.jsx to add /subscription link in dropdown before /profile
+- [x] 6. Update src/shared/i18n/translations.js to add subscription-related translation keys
+- [x] 7. Tested: Navbar link → Subscription page → button works (check Network tab), translations added (en/ar).
 
-**Current Progress:** All steps complete. Functions added without disrupting existing logic.
+✅ Feature complete with translations! Dev server running at localhost:3000. Login → dropdown Subscription → test.
+

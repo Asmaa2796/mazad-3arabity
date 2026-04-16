@@ -9,11 +9,14 @@ import PageTop from "./features/components/PageTop/PageTop";
 import ScrollToTopButton from "./shared/components/ScrollToTopButton";
 import { pageTransition } from "./shared/animations/motion";
 import { useLanguage } from "./shared/i18n/LanguageProvider";
-import { fetchSettings } from "./Redux/Slices/contentSlice";
-import { ToastContainer } from "react-toastify";
+import { fetchNotifications, fetchSettings } from "./Redux/Slices/contentSlice";
+import { toast, ToastContainer } from "react-toastify";
 import ProtectedRoute from "./features/components/ProtectedRoute/ProtectedRoute";
 import AuthRoute from "./features/components/ProtectedRoute/AuthRoute";
 import NotificationsPage from "./features/pages/Notifications";
+import { onMessageListener, requestFCMToken } from "./firebase/firebase-messaging";
+import { IconGavel } from "@tabler/icons-react";
+
 const Home = lazy(() => import("./features/components/Home/Home"));
 const AuctionDetails = lazy(() => import("./features/components/AuctionDetails/AuctionDetails"));
 const AllAuctions = lazy(() => import("./features/components/Auctions/AllAuctions"));
@@ -31,6 +34,7 @@ const ProfilePage = lazy(() => import("./features/pages/ProfilePage"));
 const ForgotPasswordPage = lazy(() => import("./features/pages/ForgotPasswordPage"));
 const VerifyPasswordOtpPage = lazy(() => import("./features/pages/VerifyPasswordOtpPage"));
 const ResetPasswordPage = lazy(() => import("./features/pages/ResetPasswordPage"));
+const Subscription = lazy(() => import("./features/pages/Subscription"));
 
 function App() {
   const location = useLocation();
@@ -69,6 +73,29 @@ function App() {
       link.setAttribute("href", data.favicon);
     }
   }, [settings.data]);
+
+  // fcm message
+  useEffect(() => {
+    requestFCMToken().then((token) => {
+      if (token) {
+        // console.log("FCM TOKEN:", token);
+      }
+    });
+
+    onMessageListener((payload) => {
+      // console.log("Message received:", payload);
+      const audio = new Audio("/notification.mp3");
+      audio.volume = 1;
+      audio.play().catch(() => { });
+      toast.success(
+        <div>
+          <span className="text-secondary mx-1 text-success d-block"><IconGavel size={19} /> {payload?.notification?.title || t.auctions.new_auction}</span>
+          <p className="text-secondary mx-1">{payload?.notification?.body}</p>
+        </div>
+      );
+      dispatch(fetchNotifications());
+    });
+  }, []);
 
   return (
     <>
@@ -124,6 +151,11 @@ function App() {
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/subscription" element={
+                <ProtectedRoute>
+                  <Subscription />
                 </ProtectedRoute>
               } />
               <Route path="/create-ad" element={

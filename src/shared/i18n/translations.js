@@ -102,6 +102,7 @@ export const translations = {
       isWinner: "Winner",
       noAuctions: "No Auctions",
       link: "Link",
+      noReports: "No Reports",
       carInfo: "Car Information",
       pricingInfo: "Pricing Information",
       auctionDates: "Auction Dates",
@@ -119,7 +120,10 @@ export const translations = {
       bid_submitted_successfully: "Bid submitted successfully",
       offer_accepted_successfully: "Offer accepted successfully",
       failed_to_submit_bid: "Failed to submit bid",
-      failed_to_accept_offer: "Failed to accept offer"
+      failed_to_accept_offer: "Failed to accept offer",
+      auction_ended: "The auction time has ended",
+      new_auction: "New Auction",
+      please_renew_subscription: "Please renew your subscription"
     },
     brands: {
       title: "Brands",
@@ -201,7 +205,21 @@ export const translations = {
       visit: "Visit your profile",
       logout: "Logout",
       seller: "Seller",
-      buyer: "Buyer"
+      buyer: "Buyer",
+      subscription: "Subscription"
+    },
+    subscription: {
+      title: "Subscription",
+      subtitle: "Subscribe to unlock premium features and participate in exclusive auctions.",
+      subscribed: "You have active subscription.",
+      subscribed_title: "Subscribed!",
+      not_subscribed: "Subscribe now to access premium features.",
+      pay_subscribe: "Pay & Subscribe",
+      subscribing: "Subscribing...",
+      already_subscribed: "You are already subscribed to premium features.",
+      ends_at: "Subscription ends at",
+      subscription_price: "Subscription price",
+      the_subscription_ends_when_you_buy_or_sell_a_car: "The subscription ends when you buy or sell a car."
     },
     createAd: {
       title: "Create Auction Ad",
@@ -355,6 +373,7 @@ export const translations = {
       isWinner: "الفائز",
       noAuctions: "لا يوجد مزادات",
       link: "رابط",
+      noReports: "لا يوجد تقارير",
       carInfo: "معلومات السيارة",
       pricingInfo: "معلومات السعر",
       auctionDates: "تواريخ المزاد",
@@ -372,7 +391,10 @@ export const translations = {
       bid_submitted_successfully: "تمت المزايدة بنجاح",
       offer_accepted_successfully: "تم قبول العرض بنجاح",
       failed_to_submit_bid: "لم تتم المزايدة",
-      failed_to_accept_offer: "لم يتم قبول العرض"
+      failed_to_accept_offer: "لم يتم قبول العرض",
+      auction_ended: "لقد انتهى وقت المزاد",
+      new_auction: "مزايدة جديدة",
+      please_renew_subscription: "يرجى تجديد اشتراكك"
     },
     brands: {
       title: "العلامات التجارية",
@@ -452,9 +474,23 @@ export const translations = {
       image: "صورة الحساب",
       update: "تحديث الملف الشخصي",
       visit: "زيارة ملفك الشخصي",
-      logout: "الخروج",
+      logout: "تسجيل خروج",
       seller: "بائع",
-      buyer: "مشتري"
+      buyer: "مشتري",
+      subscription: "الاشتراك"
+    },
+    subscription: {
+      title: "الاشتراك",
+      subtitle: "اشترك للوصول للمميزات المدفوعة والمزادات الحصرية.",
+      subscribed: "لديك اشتراك نشط.",
+      subscribed_title: "مُشترك!",
+      not_subscribed: "اشترك الآن للوصول للمميزات المدفوعة.",
+      pay_subscribe: "ادفع واشترك",
+      subscribing: "جاري الاشتراك...",
+      already_subscribed: "أنت مشترك بالفعل في المميزات المدفوعة.",
+      ends_at: "الاشتراك ينتهي في",
+      subscription_price: "سعر الاشتراك",
+      the_subscription_ends_when_you_buy_or_sell_a_car: "ينتهي الاشتراك عند شراء سيارة أو بيع سيارة"
     },
     createAd: {
       title: "إضافة إعلان عن مزاد",

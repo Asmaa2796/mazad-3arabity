@@ -20,7 +20,8 @@ const initialState = {
   countries: createAsyncState(),
   postAuction: createAsyncState(),
   postBid: createAsyncState(),
-  acceptOffer: createAsyncState()
+  acceptOffer: createAsyncState(),
+  activeAuctionId: null,
 };
 
 export const fetchAuctions = createAsyncThunk("auctions/fetchAuctions", async (page = 1, thunkAPI) => {
@@ -87,13 +88,13 @@ export const fetchAllBids = createAsyncThunk(
   }
 );
 
-export const fetchCountries = createAsyncThunk("auctions/fetchCountries", async (language, thunkAPI) => {
+export const fetchCountries = createAsyncThunk("auctions/fetchCountries", async (lang, thunkAPI) => {
   try {
     const token = getToken();
     const response = await axios.get(`${BASE_URL}/countries?per_page=100`, {
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        "Accept-Language": language,
+        "Accept-Language": lang,
       },
     });
     return response.data;
@@ -168,7 +169,7 @@ export const acceptOffer = createAsyncThunk(
       const token = getToken();
       const currentLang = getCurrentLanguage();
 
-      const response = await axios.post(`${BASE_URL}/bids/${id}/accept`, {
+      const response = await axios.post(`${BASE_URL}/bids/${id}/accept`,{}, {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           "Accept-Language": currentLang,
@@ -204,7 +205,11 @@ const setRejected = (stateKey) => (state, action) => {
 const auctionsSlice = createSlice({
   name: "auctions",
   initialState,
-  reducers: {},
+  reducers: {
+    setActiveAuctionId: (state, action) => {
+    state.activeAuctionId = action.payload;
+  },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAuctions.pending, setPending("auctions"))
@@ -239,5 +244,5 @@ const auctionsSlice = createSlice({
       .addCase(acceptOffer.rejected, setRejected("acceptOffer"));
   },
 });
-
+export const { setActiveAuctionId } = auctionsSlice.actions;
 export default auctionsSlice.reducer;

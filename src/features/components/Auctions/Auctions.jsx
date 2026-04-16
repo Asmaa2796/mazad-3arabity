@@ -30,7 +30,6 @@ const Auctions = () => {
                         <div className="col-xl-4 col-lg-4 col-md-6 col-12" key={auction?.id || index}>
                             <a href={`/auction-details/${auction.id}`} className={`${style.auction_card} my-2 d-block bg-white`}>
 
-                                {/* <div className={style.new_auction}>{t.auctions.new}</div> */}
                                 <Swiper
                                     key={`${language}-${auction.id}`}
                                     dir={isArabic ? "rtl" : "ltr"}
@@ -103,7 +102,9 @@ const Auctions = () => {
 
                                     {auction?.status === "sold" ? (
                                         <button className={style.sold} disabled>{t.auctions.sold}</button>
-                                    ) : (
+                                    ) : auction?.remaining_time === null ?  (
+                                        <button className={style.sold} disabled>{t.auctions.auction_ended}</button>
+                                    ):(
                                         <button className={`${style.bid_btn} shadow-sm`}>
                                             {t.auctions.bidding}
                                         </button>

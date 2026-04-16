@@ -24,7 +24,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }
   }, [location.pathname]);
 
-
   let redirectTo = null;
 
   if (location.pathname === "/create-ad") {
@@ -34,7 +33,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         toast.info(t.nav.please_login);
         hasShownToastRef.current = true;
       }
-    } else if (!user || !allowedRoles.includes(user?.role)) {
+    }
+    else if (!user || !allowedRoles.includes(user?.role)) {
       redirectTo = "/";
       if (!hasShownToastRef.current) {
         toast.warning(t.nav.you_cant_create_ad);

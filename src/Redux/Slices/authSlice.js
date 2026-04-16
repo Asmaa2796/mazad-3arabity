@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { BASE_URL, getCurrentLanguage, getToken } from "../../shared/utils.js/utils";
+import { requestFCMToken } from "../../firebase/firebase-messaging";
 
 const getHeaders = (extra = {}) => {
   const token = getToken();
@@ -40,23 +41,33 @@ const initialState = {
   token: localStorage.getItem("token") || null,
 };
 
-export const loginUser = createAsyncThunk("auth/loginUser", async (payload, { rejectWithValue }) => {
-  try {
-    const formData = new FormData();
-    formData.append("phone", payload.phone);
-    formData.append("password", payload.password);
-    formData.append("fcm_token", "sfml");
+export const loginUser = createAsyncThunk(
+  "auth/loginUser",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const fcmToken = await requestFCMToken();
 
-    const response = await axios.post(`${BASE_URL}/login`, formData, {
-      headers: getHeaders({ "Content-Type": "multipart/form-data" }),
-    });
-    const token = response.data?.data?.token;
-    if (token) localStorage.setItem("token", token);
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(parseError(error, "Failed to login"));
+      const formData = new FormData();
+      formData.append("phone", payload.phone);
+      formData.append("password", payload.password);
+
+      if (fcmToken) {
+        formData.append("fcm_token", fcmToken);
+      }
+
+      const response = await axios.post(`${BASE_URL}/login`, formData, {
+        headers: getHeaders({ "Content-Type": "multipart/form-data" }),
+      });
+
+      const token = response.data?.data?.token;
+      if (token) localStorage.setItem("token", token);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(parseError(error, "Failed to login"));
+    }
   }
-});
+);
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
