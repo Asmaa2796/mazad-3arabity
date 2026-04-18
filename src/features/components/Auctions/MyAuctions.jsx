@@ -30,7 +30,7 @@ const MyAuctions = () => {
             return;
         }
         dispatch(fetchAuctions({ type, page }));
-    }, [dispatch, type, page, token, user?.role, navigate]);
+    }, [dispatch, type, page, token, user?.role, navigate,dataLanguage]);
 
     useEffect(() => {
         if (token) {
