@@ -9,21 +9,22 @@ import { fetchAuctions } from "../../../Redux/Slices/auctionsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 const placeholder = "/car_placeholder.jpg";
-const Auctions = () => {
+const AllAuctions = () => {
     const { language, isArabic, t } = useLanguage();
     const dispatch = useDispatch();
-    const { auctionDetailsState, data, language: dataLanguage, pagination } = useSelector((state) => state.auctions.auctions);
+    const auctionsState = useSelector((state) => state.auctions.auctions);
+    const { data, language: dataLanguage, pagination } = auctionsState;
 
     const [page, setPage] = useState(1);
 
     useEffect(() => {
-        if (auctionDetailsState?.status === "idle" || auctionDetailsState?.language !== dataLanguage) {
-            dispatch(fetchAuctions(page));
-        }
-    }, [dispatch, auctionDetailsState?.status, auctionDetailsState?.language, dataLanguage, page, pagination]);
+        dispatch(fetchAuctions({ type: 'all', page }));
+    }, [dispatch, page]);
+
     useEffect(() => {
         setPage(1);
-    }, [dataLanguage]);
+    }, [dataLanguage, language]);
+
     useEffect(() => {
         window.scrollTo({
             top: 0,
@@ -35,18 +36,17 @@ const Auctions = () => {
         <div className={`${style.auctions} py-5`}>
             <div className="container">
                 <h2 className="text-center fw-medium mb-4">{t.auctions.all}</h2>
-                {auctionDetailsState?.status === "loading" ? (
+                {auctionsState.status === "loading" ? (
                     <div className="text-center py-5">{t.common.loading}</div>
-                ) : auctionDetailsState?.error ? (
+                ) : auctionsState.error ? (
                     <div className="alert alert-danger my-3">
-                        {auctionDetailsState?.error}
+                        {auctionsState.error}
                     </div>
                 ) : (<>
                     <div className="row">
                         {(data || []).map((auction, index) => (
                             <div className="col-xl-4 col-lg-4 col-md-6 col-12" key={auction?.id || index}>
                                 <a href={`/auction-details/${auction.id}`} className={`${style.auction_card} my-2 d-block bg-white`}>
-
                                     <Swiper
                                         key={`${language}-${auction.id}`}
                                         dir={isArabic ? "rtl" : "ltr"}
@@ -65,8 +65,6 @@ const Auctions = () => {
                                             </SwiperSlide>
                                         ))}
                                     </Swiper>
-
-                                    {/* Content */}
                                     <div className="p-3">
                                         <h5 className="fw-medium">{auction?.brand?.name} - {auction?.model}</h5>
                                         <p className="text-md text-secondary">{auction?.description?.slice(0, 80)}...</p>
@@ -77,7 +75,6 @@ const Auctions = () => {
                                                         <IconCurrencyDollar size={14} />
                                                     </span>
                                                     <span className="mx-1"> {t.auctions.currentPrice}:</span>
-
                                                 </span>
                                                 <span>{auction?.highest_bid} {t.auctions.pounds}</span>
                                             </li>
@@ -113,7 +110,6 @@ const Auctions = () => {
                                                         </span>
                                                     </>
                                                 )}
-
                                             </li>
                                         </ul>
                                         {auction?.status === "sold" ? (
@@ -125,7 +121,6 @@ const Auctions = () => {
                                                 {t.auctions.bidding}
                                             </button>
                                         )}
-
                                     </div>
                                 </a>
                             </div>
@@ -133,7 +128,6 @@ const Auctions = () => {
                     </div>
                     {pagination?.last_page > 1 && (
                         <div className={`${style.pagination} d-flex justify-content-center align-items-center gap-2 mt-4`}>
-
                             <button
                                 className={style.page_btn}
                                 disabled={page === 1}
@@ -141,7 +135,6 @@ const Auctions = () => {
                             >
                                 {isArabic ? <IconChevronRight size={17} /> : <IconChevronLeft size={17} />}
                             </button>
-
                             {Array.from({ length: pagination?.last_page || 0 }, (_, i) => (
                                 <button
                                     key={i}
@@ -151,7 +144,6 @@ const Auctions = () => {
                                     {i + 1}
                                 </button>
                             ))}
-
                             <button
                                 className={style.page_btn}
                                 disabled={page === pagination?.last_page}
@@ -159,15 +151,13 @@ const Auctions = () => {
                             >
                                 {isArabic ? <IconChevronLeft size={17} /> : <IconChevronRight size={17} />}
                             </button>
-
                         </div>
                     )}
-                </>
-                )}
-
+                </>)}
             </div>
         </div>
     );
 };
 
-export default Auctions;
+export default AllAuctions;
+

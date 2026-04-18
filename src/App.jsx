@@ -20,6 +20,8 @@ import { IconGavel } from "@tabler/icons-react";
 const Home = lazy(() => import("./features/components/Home/Home"));
 const AuctionDetails = lazy(() => import("./features/components/AuctionDetails/AuctionDetails"));
 const AllAuctions = lazy(() => import("./features/components/Auctions/AllAuctions"));
+const MyAuctions = lazy(() => import("./features/components/Auctions/MyAuctions"));
+const MyBids = lazy(() => import("./features/components/Auctions/MyBids"));
 const CreateAd = lazy(() => import("./features/components/CreateAd/CreateAd"));
 const AboutPage = lazy(() => import("./features/pages/AboutPage"));
 const PrivacyPage = lazy(() => import("./features/pages/PrivacyPage"));
@@ -165,6 +167,16 @@ function App() {
               } />
               <Route path="/auction-details/:id" element={<AuctionDetails />} />
               <Route path="/all-auctions" element={<AllAuctions />} />
+              <Route path="/my-auctions" element={
+                <ProtectedRoute>
+                  <MyAuctions />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-bids" element={
+                <ProtectedRoute>
+                  <MyBids />
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </motion.div>
@@ -179,3 +191,4 @@ function App() {
 }
 
 export default App;
+

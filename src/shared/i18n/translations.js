@@ -13,8 +13,8 @@ export const translations = {
       services: "Services",
       auctions: "Auctions",
       about: "About",
-      privacy: "Privacy",
-      terms: "Terms",
+      privacy: "Privacy Policy",
+      terms: "Terms & Conditions",
       faqs: "FAQs",
       contact: "Contact",
       createAd: "Create Ad",
@@ -27,7 +27,8 @@ export const translations = {
       desc: "Follow live auctions and discover listed cars clearly, then join bidding with speed and ease.",
       quickLinks: "Quick Links",
       stayConnected: "Stay Connected",
-      rights: "All rights reserved | Mazad Cars",
+      rights: "All rights reserved |",
+      btech: "Brmja tech"
     },
     contact: {
       title: "Contact Us",
@@ -206,7 +207,9 @@ export const translations = {
       logout: "Logout",
       seller: "Seller",
       buyer: "Buyer",
-      subscription: "Subscription"
+      subscription: "Subscription",
+      myAuctions: "My Auctions",
+      myBids: "My bids"
     },
     subscription: {
       title: "Subscription",
@@ -267,7 +270,7 @@ export const translations = {
       step4Title: "Review Ad",
       step4Desc: "Please review all information before confirming your ad",
       reviewEdit: "Edit",
-      submitted: "Ad submitted successfully!"
+      submitted: "Auction submitted successfully!"
     }
   },
   ar: {
@@ -284,8 +287,8 @@ export const translations = {
       services: "الخدمات",
       auctions: "المزادات",
       about: "عن مزاد عربيتي",
-      privacy: "الخصوصية",
-      terms: "الشروط",
+      privacy: "سياسية الخصوصية",
+      terms: "الشروط والأحكام",
       faqs: "الأسئلة الشائعة",
       contact: "تواصل معنا",
       createAd: "إضافة إعلان",
@@ -298,7 +301,8 @@ export const translations = {
       desc: "تابع أحدث المزادات مباشرة وشاهد السيارات المعروضة بوضوح وشارك في المنافسة بسهولة وسرعة.",
       quickLinks: "روابط سريعة",
       stayConnected: "ابق على تواصل",
-      rights: "جميع الحقوق محفوظة | مزاد عربيتي",
+      rights: "جميع الحقوق محفوظة |",
+      btech: "برمجة تك"
     },
     contact: {
       title: "تواصل معنا",
@@ -477,7 +481,9 @@ export const translations = {
       logout: "تسجيل خروج",
       seller: "بائع",
       buyer: "مشتري",
-      subscription: "الاشتراك"
+      subscription: "الاشتراك",
+      myAuctions: "مزاداتي",
+      myBids: "مزايداتي"
     },
     subscription: {
       title: "الاشتراك",
@@ -538,7 +544,7 @@ export const translations = {
       step4Title: "مراجعة الإعلان",
       step4Desc: "يرجى مراجعة جميع المعلومات قبل تأكيد الإعلان",
       reviewEdit: "تعديل",
-      submitted: "تم إرسال الإعلان بنجاح!"
+      submitted: "تم نشر المزاد بنجاح!"
     }
   }
 };

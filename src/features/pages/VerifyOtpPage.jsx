@@ -46,7 +46,7 @@ const VerifyOtpPage = () => {
     const error = validate();
     if (error) return setClientError(error);
     const result = await dispatch(verifyOtp(form));
-    if (verifyOtp.fulfilled.match(result)) navigate("/");
+    if (verifyOtp.fulfilled.match(result)) navigate("/login");
   };
 
   const onResend = async () => {

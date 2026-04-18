@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import 'font-awesome/css/font-awesome.min.css';
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import * as bootstrap from "bootstrap";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 import reportWebVitals from './reportWebVitals';
@@ -11,6 +11,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { store } from './Redux/store';
 import { Provider } from 'react-redux';
 import { LanguageProvider } from './shared/i18n/LanguageProvider';
+window.bootstrap = bootstrap;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
