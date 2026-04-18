@@ -7,7 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -77,14 +77,14 @@ const Hero = () => {
                     {slide.title ? <h1 className={slide.titleColor}>{slide.title}</h1> : null}
                     {slide.description ? <p className="text-dark">{slide.description}</p> : null}
                   </div>
-                  <div className="d-flex pt-5 mt-5">
+                  {/* <div className="d-flex pt-5 mt-5">
                     <Link className={`${style.hero_link} ${slide.linkBg} mt-5`}>
                       {isArabic ? "مشاهدة المزيد" : "View More"} <IconChevronLeft size={17} />
                     </Link>
                     <Link className={`${style.hero_link_transparent} ${slide.borderColor} ${slide.linkColor} mt-5`}>
                       {isArabic ? "اعرض عربيتك" : "List Your Car"} <IconChevronLeft size={17} />
                     </Link>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </SwiperSlide>

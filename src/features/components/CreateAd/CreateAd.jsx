@@ -29,14 +29,14 @@ const CreateAd = () => {
     const dispatch = useDispatch();
     const { t, language } = useLanguage();
     const { brands } = useSelector((state) => state.content);
-    const { countries, postAuction : postAuctionState } = useSelector((state) => state.auctions);
+    const { countries, postAuction: postAuctionState } = useSelector((state) => state.auctions);
     const [govAdditional, setGovAdditional] = useState({ page: 1 });
     const [hasGovernorates, setHasGovernorates] = useState(false);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         // first step fields
         brand_id: null,
-        model: '', 
+        model: '',
         manufacture_date: '',
         country_id: null,
         governorate_id: null,
@@ -248,9 +248,9 @@ const CreateAd = () => {
         if (brands.status === 'idle') {
             dispatch(fetchBrands({ lang: language }));
         }
-        
+
         if (postAuctionState.status === "succeeded") {
-            toastify.success(t.createAd.submitted, {
+            toastify.success(postAuctionState.success || t.createAd.submitted, {
                 onClose: () => {
                     window.location.href = "/all-auctions";
                 }
@@ -259,9 +259,9 @@ const CreateAd = () => {
 
         if (postAuctionState.status === "failed") {
             toastify.error(postAuctionState.error || "Something went wrong");
-        } 
+        }
 
-    }, [brands.status, postAuctionState.status, navigate, dispatch, language,t,postAuctionState.error]);
+    }, [brands.status, postAuctionState.status, navigate, postAuctionState.success, dispatch, language, t, postAuctionState.error]);
 
     useEffect(() => {
         const stepperEl = document.querySelector('#stepper');
@@ -597,10 +597,10 @@ const CreateAd = () => {
                                                 )
                                             }
                                             onKeyDown={(e) => {
-    if (e.key === "." || e.key === "e" || e.key === "-") {
-      e.preventDefault();
-    }
-  }}
+                                                if (e.key === "." || e.key === "e" || e.key === "-") {
+                                                    e.preventDefault();
+                                                }
+                                            }}
                                             placeholder={t.createAd.selling_pricePlaceholder}
                                             min="0"
                                         />

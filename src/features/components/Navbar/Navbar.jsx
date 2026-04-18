@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { IconBellRinging, IconCar, IconMenu3, IconPlus, IconSearch } from '@tabler/icons-react';
-import Collapse from "bootstrap/js/dist/collapse";
+import { IconBellRinging, IconCar, IconMenu3, IconPlus } from '@tabler/icons-react';
 import { motion } from "framer-motion";
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,22 +15,23 @@ const Navbar = () => {
     const { t, toggleLanguage, language } = useLanguage();
     const links = [
         { to: "/", label: t.nav.home },
-        { to: "/services", label: t.nav.services },
-        { to: "/all-auctions", label: t.nav.auctions },
         { to: "/about-us", label: t.nav.about },
+        { to: "/all-auctions", label: t.nav.auctions },
+        { to: "/privacy", label: t.nav.privacy },
         { to: "/faqs", label: t.nav.faqs },
         { to: "/contact-us", label: t.nav.contact },
     ];
 
     const handleNavLinkClick = () => {
-        if (window.innerWidth < 992) {
-            const navbarCollapse = document.getElementById("navbarNav");
-            if (navbarCollapse) {
-                const bsCollapse = Collapse.getInstance(navbarCollapse) || new Collapse(navbarCollapse);
-                bsCollapse.hide();
-            }
+    if (window.innerWidth < 992) {
+        const navbarCollapse = document.getElementById("navbarNav");
+        if (navbarCollapse) {
+            const bsCollapse =
+                window.bootstrap.Collapse.getOrCreateInstance(navbarCollapse);
+            bsCollapse.hide();
         }
-    };
+    }
+};
 
     const handleCreateAdClick = (e) => {
         handleNavLinkClick(e);
@@ -103,7 +103,6 @@ const Navbar = () => {
                             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="d-inline-block mx-1">
                                 <Link onClick={handleCreateAdClick} to="/create-ad" className="btn px-2 btn-success rounded-5 btn-sm shadow-sm text-sm"><IconPlus size={14} color="#fff" /> {t.nav.createAd}</Link>
                             </motion.div>
-                            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="btn px-1 main-color btn-sm"><IconSearch size={17} color="#333" /></motion.button>
                             {token ? (
                                 <div className="dropdown d-inline-block">
                                     <button className="btn p-0 border-0 bg-transparent" data-bs-toggle="dropdown" aria-expanded="false">
@@ -120,10 +119,16 @@ const Navbar = () => {
                                             <Link className="dropdown-item text-sm" to="/profile">{t.profile.visit}</Link>
                                         </li>
                                         <li>
-                                            <Link className="dropdown-item text-sm" to="/subscription">{t.profile.subscription}</Link>
+                                            <Link className="dropdown-item text-sm" to={user?.role === "seller" ? "/my-auctions" : "/my-bids"}>
+                                            {user?.role === "seller" ? t.profile.myAuctions : t.profile.myBids}
+                                            </Link>
                                         </li>
                                         <li>
-                                            <button className="dropdown-item text-sm" type="button" onClick={handleLogout}>{t.profile.logout}</button>
+                                            <Link className="dropdown-item text-sm" to="/subscription">{t.profile.subscription}</Link>
+                                        </li>
+                                        <li><hr className="border-secondary mx-2 my-1"/></li>
+                                        <li>
+                                            <button className="dropdown-item text-sm text-danger" type="button" onClick={handleLogout}>{t.profile.logout}</button>
                                         </li>
                                     </ul>
                                 </div>
@@ -140,3 +145,4 @@ const Navbar = () => {
     );
 }
 export default Navbar;
+

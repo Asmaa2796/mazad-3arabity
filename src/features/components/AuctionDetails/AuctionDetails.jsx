@@ -27,7 +27,7 @@ import { acceptOffer, fetchAuctionDetails, postBid } from "../../../Redux/Slices
 import { useLanguage } from "../../../shared/i18n/LanguageProvider";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase/config";
@@ -45,7 +45,8 @@ const AuctionDetails = () => {
   const acceptOfferState = useSelector((state) => state.auctions.acceptOffer);
   const { user } = useSelector((state) => state.auth);
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
-  const [isAccepting, setIsAccepting] = useState(false);
+  const isAcceptingRef = useRef(false);
+  const acceptedBidIdRef = useRef(null);
   const formatDateTime = (dateInput) => {
     const date = new Date(dateInput);
 
@@ -104,7 +105,7 @@ const AuctionDetails = () => {
                 bid_price: bid.price,
                 user_id: user?.id,
                 created_at: formatDateTime(new Date()),
-                accepted: false,
+                accepted: null,
               }),
             },
             { merge: true }
@@ -119,61 +120,60 @@ const AuctionDetails = () => {
     };
 
     syncBidToFirebase();
-  }, [postBidState.status,postBidState.data,user?.id, t, dispatch,isSubmittingBid,id,postBidState.error]);
+  }, [postBidState.status, postBidState.data, user?.id, t, dispatch, isSubmittingBid, id, postBidState.error]);
 
   useEffect(() => {
-  const syncAcceptToFirebase = async () => {
-    if (!isAccepting) return;
+    const syncAcceptToFirebase = async () => {
+      if (!isAcceptingRef.current) return;
 
-    if (acceptOfferState.status === "succeeded") {
-      setIsAccepting(false);
-      const audio = new Audio("/notification.mp3");
+      if (acceptOfferState.status === "succeeded") {
+        isAcceptingRef.current = false;
+
+        const audio = new Audio("/notification.mp3");
         audio.volume = 1;
         audio.play().catch(() => { });
 
-      toast.success(
-        acceptOfferState.data?.message ||
-        t.auctions.offer_accepted_successfully
-      );
+        toast.success(
+          acceptOfferState.data?.message ||
+          t.auctions.offer_accepted_successfully
+        );
 
-      const result = acceptOfferState.data?.data;
-      const bidId = result?.id;
-      const auctionId = result?.auction_id;
+        const bidId = acceptedBidIdRef.current;
+        const auctionId = id;
 
-      if (auctionId && bidId) {
-        const docRef = doc(db, "auction_bids", String(auctionId));
-        const snapshot = await getDoc(docRef);
+        if (auctionId && bidId) {
+          const docRef = doc(db, "auction_bids", String(auctionId));
 
-        if (snapshot.exists()) {
-          const data = snapshot.data();
-          const bids = data?.bids || [];
+          const snapshot = await getDoc(docRef);
 
-          const updatedBids = bids.map((bid) => {
-            if (String(bid.id) === String(bidId)) {
-              return { ...bid, accepted: true };
-            }
-            return { ...bid, accepted: false };
-          });
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            const currentBids = data?.bids || [];
 
-          await updateDoc(docRef, {
-            bids: updatedBids,
-          });
+            const updatedBids = currentBids.map((bid) => ({
+              ...bid,
+              accepted: String(bid.id) === String(bidId),
+            }));
+
+            await updateDoc(docRef, {
+              bids: updatedBids,
+            });
+          }
         }
+
+        dispatch(fetchAuctionDetails(id));
       }
 
-      dispatch(fetchAuctionDetails(id));
-    }
+      if (acceptOfferState.status === "failed") {
+        isAcceptingRef.current = false;
+        toast.error(
+          acceptOfferState.error || t.auctions.failed_to_accept_offer
+        );
+      }
+    };
 
-    if (acceptOfferState.status === "failed") {
-      setIsAccepting(false); 
-      toast.error(
-        acceptOfferState.error || t.auctions.failed_to_accept_offer
-      );
-    }
-  };
-
-  syncAcceptToFirebase();
-}, [acceptOfferState.status, isAccepting, t, dispatch, id,acceptOfferState.error,acceptOfferState.data?.data,acceptOfferState?.data?.message]);
+    syncAcceptToFirebase();
+  }, [acceptOfferState.status, t, dispatch, id, acceptOfferState.error, acceptOfferState.data?.data, acceptOfferState?.data?.message]);
 
   const images =
     record?.gallery?.length
@@ -232,7 +232,7 @@ const AuctionDetails = () => {
       return;
     }
 
-    // User is valid, show Bootstrap modal using JS
+    // User is valid, show Bootstrap modal
     const modalEl = document.getElementById("presentOfferModal");
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
@@ -262,16 +262,16 @@ const AuctionDetails = () => {
     dispatch(postBid(payload));
   };
 
-  //  handle accept offer
+  // handle accept offer
   const handleAcceptOffer = async (bidId) => {
     if (loadingBidId) return;
 
     setLoadingBidId(bidId);
-    setIsAccepting(true);
+    isAcceptingRef.current = true;
+    acceptedBidIdRef.current = bidId;
 
     try {
-      await dispatch(acceptOffer(bidId)).unwrap()
-
+      await dispatch(acceptOffer(bidId)).unwrap();
     } catch (error) {
       console.log(error?.message || t.common.error);
     } finally {
@@ -279,11 +279,6 @@ const AuctionDetails = () => {
     }
   };
 
-  // show the winner at the first
-  const sortedBids = [...bids].sort((a, b) => {
-    if (a.accepted === b.accepted) return 0;
-    return a.accepted ? -1 : 1;
-  });
   return (
     <>
       {status === "loading" ? (
@@ -549,7 +544,7 @@ const AuctionDetails = () => {
                     <div className="col-12 mt-3">
                       <h5 className="mb-3">{t.auctions.report}</h5>
                       <div className="bg-light px-4 py-2 rounded-3 my-2 d-flex align-items-center">
-                        {record?.record ? (
+                        {record?.report ? (
                           <>
                             <img
                               alt="pdf"
@@ -598,75 +593,75 @@ const AuctionDetails = () => {
                 tabIndex="0"
               >
                 <div className="my-3 p-4">
-                  {Array.isArray(sortedBids) && sortedBids.length > 0 ? (
+                  {Array.isArray(bids) && bids.length > 0 ? (
                     <div className="row">
-                      {sortedBids?.map((bid) => (
-
-                        <div key={bid?.id} className="col-xl-6 col-lg-6 col-md-6 col-12">
-                          <div className={style.offer_card}>
-                            {bid?.accepted && (
-                              <div className={style.is_winner}>
-                                <IconTrophy size={14} /> {t.auctions.isWinner}
-                              </div>
-                            )}
-
-                            <div className="d-flex align-items-center justify-content-between">
-                              <div className="d-flex align-items-center">
-                                <img
-                                  src={bid?.user?.image || "/image.jpg"}
-                                  style={{
-                                    width: "40px",
-                                    height: "40px",
-                                    borderRadius: "50%",
-                                  }}
-                                  alt="img"
-                                  className="object-fit-cover"
-                                />
-
-                                <div className="mx-2">
-                                  <span className="text-dark d-block">
-                                    {bid?.user?.name}
-                                  </span>
-
-                                  <span className="sub-color d-block">
-                                    {bid?.bid_price} {t.auctions.pounds}
-                                  </span>
+                      {[...bids]
+                        .sort((a, b) => Number(b.bid_price) - Number(a.bid_price)).map((bid) => (
+                          <div key={bid?.id} className="col-xl-6 col-lg-6 col-md-6 col-12">
+                            <div className={style.offer_card}>
+                              {bid?.accepted && (
+                                <div className={style.is_winner}>
+                                  <IconTrophy size={14} /> {t.auctions.isWinner}
                                 </div>
+                              )}
+
+                              <div className="d-flex align-items-center justify-content-between">
+                                <div className="d-flex align-items-center">
+                                  <img
+                                    src={bid?.user?.image || "/image.jpg"}
+                                    style={{
+                                      width: "40px",
+                                      height: "40px",
+                                      borderRadius: "50%",
+                                    }}
+                                    alt="img"
+                                    className="object-fit-cover"
+                                  />
+
+                                  <div className="mx-2">
+                                    <span className="text-dark d-block">
+                                      {bid?.user?.name}
+                                    </span>
+
+                                    <span className="sub-color d-block">
+                                      {bid?.bid_price} {t.auctions.pounds}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <span className="text-secondary d-flex align-items-center text-sm">
+                                  <IconClock size={17} className="me-1" />
+                                  {bid?.created_at}
+                                </span>
                               </div>
 
-                              <span className="text-secondary d-flex align-items-center text-sm">
-                                <IconClock size={17} className="me-1" />
-                                {bid?.created_at}
-                              </span>
+                              {record?.meta?.is_owner && (
+                                <>
+                                  {bid?.accepted && (
+                                    <span
+                                      className="sub-color my-3 d-flex justify-content-center align-items-center fw-medium text-center"
+                                      style={{ direction: "ltr" }}
+                                    >
+                                      {bid?.user?.phone || "—"} <IconPhone size={16} className="ms-1" />
+                                    </span>
+                                  )}
+
+                                  {record?.status === "active" && (
+                                    <button
+                                      className={style.accept_offer}
+                                      onClick={() => handleAcceptOffer(bid?.id)}
+                                      disabled={loadingBidId === bid?.id}
+                                    >
+                                      {loadingBidId === bid?.id
+                                        ? t.common.loading
+                                        : t.auctions.acceptOffer}
+                                    </button>
+                                  )}
+                                </>
+                              )}
                             </div>
-
-                            {record?.meta?.is_owner && (
-                              <>
-                                {bid?.accepted && (
-                                  <span
-                                    className="sub-color my-3 d-flex justify-content-center align-items-center fw-medium text-center"
-                                    style={{ direction: "ltr" }}
-                                  >
-                                    {bid?.user?.phone || "—"} <IconPhone size={16} className="ms-1" />
-                                  </span>
-                                )}
-
-                                {record?.status === "active" && (
-                                  <button
-                                    className={style.accept_offer}
-                                    onClick={() => handleAcceptOffer(bid?.id)}
-                                    disabled={loadingBidId === bid?.id}
-                                  >
-                                    {loadingBidId === bid?.id
-                                      ? t.common.loading
-                                      : t.auctions.acceptOffer}
-                                  </button>
-                                )}
-                              </>
-                            )}
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   ) : (
                     <div className="text-center">

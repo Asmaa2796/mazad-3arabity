@@ -22,23 +22,31 @@ const initialState = {
   postBid: createAsyncState(),
   acceptOffer: createAsyncState(),
   activeAuctionId: null,
+  currentType: null,
 };
 
-export const fetchAuctions = createAsyncThunk("auctions/fetchAuctions", async (page = 1, thunkAPI) => {
+export const fetchAuctions = createAsyncThunk("auctions/fetchAuctions", async ({ type, page = 1 } = {}, thunkAPI) => {
   try {
     const token = getToken();
     const currentLang = getCurrentLanguage();
-    const response = await axios.get(`${BASE_URL}/auctions?page=${page}`, {
+    let url = `${BASE_URL}/auctions`;
+    const params = new URLSearchParams();
+    if (type) params.append('type', type);
+    params.append('page', page);
+    url += `?${params.toString()}`;
+    const response = await axios.get(url, {
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         "Accept-Language": currentLang,
       },
     });
-    return response.data;
+    return { ...response.data, type };
   } catch (error) {
     return thunkAPI.rejectWithValue(normalizeError(error));
   }
 });
+
+// ... all other thunks unchanged: fetchAuctionDetails, fetchAllBids, etc.
 
 export const fetchAuctionDetails = createAsyncThunk(
   "auctions/fetchAuctionDetails",
@@ -195,6 +203,9 @@ const setFulfilled = (stateKey) => (state, action) => {
   state[stateKey].pagination = action.payload?.pagination ?? null;
   state[stateKey].language = getCurrentLanguage();
   state[stateKey].error = null;
+  if (stateKey === 'auctions' && action.meta.arg?.type) {
+    state.currentType = action.meta.arg.type;
+  }
 };
 
 const setRejected = (stateKey) => (state, action) => {
@@ -246,3 +257,4 @@ const auctionsSlice = createSlice({
 });
 export const { setActiveAuctionId } = auctionsSlice.actions;
 export default auctionsSlice.reducer;
+

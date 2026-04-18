@@ -2,15 +2,20 @@ import { Link } from 'react-router-dom';
 import style from './footer.module.css';
 import { IconPhone,IconMail,IconWorld } from '@tabler/icons-react';
 import { useLanguage } from '../../../shared/i18n/LanguageProvider';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchSettings } from '../../../Redux/Slices/contentSlice';
+import { useEffect } from 'react';
 const Footer = () => {
     const { t } = useLanguage();
+    const dispatch = useDispatch();
     const settings = useSelector((state) => state.content.settings.data);
+    useEffect(() => {
+        dispatch(fetchSettings())
+    }, [dispatch]);
     const links = [
         { to: "/", label: t.nav.home },
-        { to: "/services", label: t.nav.services },
-        { to: "/all-auctions", label: t.nav.auctions },
         { to: "/about-us", label: t.nav.about },
+        { to: "/all-auctions", label: t.nav.auctions },
         { to: "/privacy", label: t.nav.privacy },
         { to: "/terms", label: t.nav.terms },
         { to: "/faqs", label: t.nav.faqs },
@@ -49,9 +54,25 @@ const Footer = () => {
 
                 <hr className="border-secondary" />
                 <div className="text-center mt-3">
-                    <small className="text-white-50">
-                        {settings?.copyright || `© ${new Date().getFullYear()} ${t.footer.rights}`}
-                    </small>
+                    {!settings?.copyright ? (
+                        <small className="text-white-50">
+                            {settings?.copyright}
+                        </small>
+
+                    ) : (
+                        <>
+                            <small className='text-white-50'> {t.footer.rights} &copy; {new Date().getFullYear()} </small>
+                            <a
+                                className="text-info text-decoration-underline"
+                                href="https://brmja.tech/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {t.footer.btech}
+                            </a>
+
+                        </>
+                    )}
                 </div>
             </div>
         </footer>
