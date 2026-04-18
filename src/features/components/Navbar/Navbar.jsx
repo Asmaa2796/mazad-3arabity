@@ -94,7 +94,7 @@ const Navbar = () => {
                             ))}
                         </ul>
                         <div className="actions">
-                            {token && (
+                            {user && (
                                 <Link to="/notifications" className="notify_icon">
                                 <div className="pulse"></div>
                                 <IconBellRinging stroke={1} size={18}/>
@@ -103,7 +103,7 @@ const Navbar = () => {
                             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="d-inline-block mx-1">
                                 <Link onClick={handleCreateAdClick} to="/create-ad" className="btn px-2 btn-success rounded-5 btn-sm shadow-sm text-sm"><IconPlus size={14} color="#fff" /> {t.nav.createAd}</Link>
                             </motion.div>
-                            {token ? (
+                            {user ? (
                                 <div className="dropdown d-inline-block">
                                     <button className="btn p-0 border-0 bg-transparent" data-bs-toggle="dropdown" aria-expanded="false">
                                         <img
