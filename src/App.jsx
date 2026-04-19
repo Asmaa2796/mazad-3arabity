@@ -22,7 +22,9 @@ const AuctionDetails = lazy(() => import("./features/components/AuctionDetails/A
 const AllAuctions = lazy(() => import("./features/components/Auctions/AllAuctions"));
 const MyAuctions = lazy(() => import("./features/components/Auctions/MyAuctions"));
 const MyBids = lazy(() => import("./features/components/Auctions/MyBids"));
+const BrandAuctions = lazy(() => import("./features/components/Auctions/BrandAuctions"));
 const CreateAd = lazy(() => import("./features/components/CreateAd/CreateAd"));
+
 const AboutPage = lazy(() => import("./features/pages/AboutPage"));
 const PrivacyPage = lazy(() => import("./features/pages/PrivacyPage"));
 const TermsPage = lazy(() => import("./features/pages/TermsPage"));
@@ -177,6 +179,7 @@ function App() {
                   <MyBids />
                 </ProtectedRoute>
               } />
+              <Route path="/brands/:brandId/auctions" element={<BrandAuctions />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </motion.div>
