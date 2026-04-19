@@ -3,7 +3,7 @@
   position: relative;
 }
 
-.slide {
+.hero_section .slide {
   width: 100%;
   height: 500px;
   background-size: 50%;
@@ -14,12 +14,12 @@
 .content {
   text-align: center;
   color: var(--basic-color);
-      display: flex;
-    align-items: center;
-    height: 100%;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    flex-direction: column;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  flex-direction: column;
 }
 
 .content h2 {
@@ -86,4 +86,10 @@
 :global(.swiper-pagination-bullet-active) {
   background: gray !important;
   opacity: 1;
+}
+
+@media(max-width:567px) {
+  .hero_section .slide {
+    background-size: 90%;
+  }
 }

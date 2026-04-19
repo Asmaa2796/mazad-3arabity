@@ -25,13 +25,14 @@ const initialState = {
   currentType: null,
 };
 
-export const fetchAuctions = createAsyncThunk("auctions/fetchAuctions", async ({ type, page = 1 } = {}, thunkAPI) => {
+export const fetchAuctions = createAsyncThunk("auctions/fetchAuctions", async ({ type, page = 1, brand_id } = {}, thunkAPI) => {
   try {
     const token = getToken();
     const currentLang = getCurrentLanguage();
     let url = `${BASE_URL}/auctions`;
     const params = new URLSearchParams();
     if (type) params.append('type', type);
+    if (brand_id) params.append('brand_id', brand_id);
     params.append('page', page);
     url += `?${params.toString()}`;
     const response = await axios.get(url, {

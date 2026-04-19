@@ -1,4 +1,6 @@
 import style from './brands.module.css';
+import { Link } from "react-router-dom";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -55,20 +57,27 @@ const Brands = () => {
                     spaceBetween={30}
                     slidesPerView={5}
                     autoplay={{ delay: 2000, disableOnInteraction: false }}
-                    pagination={{ clickable: true   }}
+                    pagination={{
+                        clickable: true,
+                        dynamicBullets: true,
+                        dynamicMainBullets: 3
+                    }}
                     loop={true}
                     breakpoints={swiperBreakpoints}
                 >
                     {brands.map((item) => (
                         <SwiperSlide key={item.id}>
-                            <div className={`${style.brandCard} bg-white my-3 text-center rounded-3 border shadow-sm`}>
+                            <Link to={`/brands/${item.id}/auctions`} className={`${style.brandCard} bg-white my-3 text-center d-block rounded-3 border shadow-sm text-decoration-none d-block`}>
                                 <img
                                     src={item.logo}
                                     alt={item.name}
                                     className='d-block'
                                 />
-                                <div className="small text-secondary ">{item.name}</div>
-                            </div>
+                                <div className="small text-secondary d-flex align-items-center justify-content-center gap-1">
+                                    {item.name}
+                                    {isArabic ? <IconChevronLeft size={14} /> : <IconChevronRight size={14} />}
+                                </div>
+                            </Link>
                         </SwiperSlide>
                     ))}
                 </Swiper>
